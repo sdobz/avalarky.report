@@ -1,0 +1,6 @@
+set_devtoken
+.idea
+secret
+*.pyc
+env
+generator/cache

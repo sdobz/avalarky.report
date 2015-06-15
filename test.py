@@ -33,7 +33,7 @@ new_notes = []
 for note in result_list.notes:
     if note.guid not in note_data or note_data[note.guid].updated < note.updated:
         note_data[note.guid] = noteStore.getNote(note.guid, True, True, True, True)
-    new_notes.append(note_data[note.guid])
+        new_notes.append(note_data[note.guid])
 
 note_data.sync()
 
@@ -45,28 +45,27 @@ import datetime
 from bs4 import BeautifulSoup
 
 
-class PelicanStore(enml.MediaStore):
-    def __init__(self, note_store, note_guid, content_root, resource_root):
-        super(PelicanStore, self).__init__(note_store, note_guid)
-        self.content_root = content_root
-        self.resource_root = resource_root
+class RelativeFileMediaStore(enml.FileMediaStore):
+    def __init__(self, note_store, note_guid, path):
+        """
+        note_store: NoteStore object from EvernoteSDK
+        note_guid: Guid of the note in which the resouces exist
+        path: The path to store media file
+        """
+        super(enml.FileMediaStore, self).__init__(note_store, note_guid)
+        self.path = path
 
     def save(self, hash_str, mime_type):
         """
         save the specified hash and return the saved file's URL
         """
-        if not os.path.exists(self.content_root):
-            os.makedirs(self.content_root)
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
         data = self._get_resource_by_hash(hash_str)
-
-        # Output in img tags
-        resource_url = path.join(self.resource_root, hash_str + enml.MIME_TO_EXTESION_MAPPING[mime_type])
-        file_path = path.join(self.content_root, resource_url)
-
+        file_path = os.path.join(self.path, hash_str + enml.MIME_TO_EXTESION_MAPPING[mime_type])
         with open(file_path, "w") as f:
             f.write(data)
-
-        return resource_url
+        return file_path
 
 
 def slugify(value):
@@ -83,9 +82,8 @@ format_timestamp = lambda ms: datetime.datetime.fromtimestamp(ms/1000).strftime(
 for note in new_notes:
     note_slug = slugify(unicode(note.title))
 
-    media_store = PelicanStore(noteStore, note.guid,
-                               content_root=CONTENT_PATH,
-                               resource_root=path.join('files', note_slug))
+    media_store = RelativeFileMediaStore(noteStore, note.guid,
+                                         path=os.path.join(CONTENT_PATH, 'files', note_slug))
 
     content_soup = BeautifulSoup('<html><head><title>{}</title></head><body></body></html>'.format(note.title))
 
@@ -108,7 +106,6 @@ for note in new_notes:
         f.write(content_soup.prettify().encode('utf-8'))
 
 
-os.chdir('site-gen')
 from pelican import main
 import sys
 sys.argv = [
