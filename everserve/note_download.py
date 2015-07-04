@@ -11,3 +11,4 @@ def get_notebooks():
     noteStore = client.get_note_store()
     return noteStore.listNotebooks()
 
+print(get_notebooks())

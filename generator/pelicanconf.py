@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 AUTHOR = u'Vincent Khougaz'
 SITENAME = u'Avalarky Report'
 SITEURL = ''
+THEME = 'themes/neat'
 
 PATH = 'content'
 STATIC_PATHS = ['files']
@@ -31,3 +32,5 @@ DEFAULT_PAGINATION = 20
 
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
+
+OUTPUT_PATH = '../www/'
