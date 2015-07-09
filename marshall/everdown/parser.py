@@ -39,7 +39,7 @@ def save_note(note, note_store, output, notebook):
     note_root = path.join(output, notebook_slug, note_slug)
     media_store = EverdownStore(note_store, note.guid, note_root=note_root)
 
-    content_soup = BeautifulSoup('<html><head><title>{}</title></head><body></body></html>'.format(note.title))
+    content_soup = BeautifulSoup('<html><head><title>{}</title></head><body></body></html>'.format(note.title), features='html.parser')
 
     def add_meta_tag(name, content):
         new_tag = content_soup.new_tag('meta', content=content)
@@ -51,7 +51,7 @@ def save_note(note, note_store, output, notebook):
     add_meta_tag('date', format_timestamp(note.created))
     add_meta_tag('modified', format_timestamp(note.updated))
 
-    note_soup = BeautifulSoup(enml.ENMLToHTML(note.content, media_store=media_store, header=False, pretty=False))
+    note_soup = BeautifulSoup(enml.ENMLToHTML(note.content, media_store=media_store, header=False, pretty=False), 'html.parser')
     note_soup.div['class'] = 'note'
 
     content_soup.body.append(note_soup)

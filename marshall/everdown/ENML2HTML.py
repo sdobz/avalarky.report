@@ -16,7 +16,7 @@ def ENMLToHTML(content, pretty=True, header=True, **kwargs):
     :param header: If True, note is wrapped in a <HTML><BODY> block.
     :type header: bool
     """
-    soup = BeautifulSoup(content)
+    soup = BeautifulSoup(content, 'html.parser')
 
     todos = soup.find_all('en-todo')
     for todo in todos:
