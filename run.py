@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env python
 
 import os
 import sys
@@ -11,3 +11,9 @@ with open('avalarky.report.kyre') as f:
 
 from marshall.everdown import run as everdown_run
 everdown_run(settings['everdown'])
+
+from marshall.pelican.horrible_monkey_patch import patch_pelican_settings
+patch_pelican_settings(settings['pelican'])
+
+from pelican import main
+sys.exit(main())

@@ -2,8 +2,44 @@
   "everdown": {
     "token": "S=s1:U=90cdf:E=1548935fe87:C=14d3184cf68:P=1cd:A=en-devtoken:V=2:H=7369fbadab16c3aee7127e04368ac34f",
     "output":  "content/everdown",
+    "cache": "cache/everdown.pickle",
     "notebooks": [
       "mo*"
     ]
+  },
+  "pelican": {
+    "AUTHOR": "Vincent Khougaz",
+    "SITENAME": "Avalarky Report",
+    "SITEURL": "avalarky.report",
+    "THEME": "marshall/pelican/themes/pelican-neat/neat",
+    "PATH": "content",
+    "STATIC_PATHS": [""],
+    "CACHE_PATH": "cache/pelican",
+    "TIMEZONE": "America/Los_Angeles",
+    "DEFAULT_LANG": "en",
+    "FEED_ALL_ATOM": null,
+    "CATEGORY_FEED_ATOM": null,
+    "TRANSLATION_FEED_ATOM": null,
+    "AUTHOR_FEED_ATOM": null,
+    "AUTHOR_FEED_RSS": null,
+    "LINKS": [
+      [
+        "You can modify those links in your config file",
+        "#"
+      ]
+    ],
+    "SOCIAL": [
+      [
+        "You can add links in your config file",
+        "#"
+      ],
+      [
+        "Another social link",
+        "#"
+      ]
+    ],
+    "DEFAULT_PAGINATION": 20,
+    "RELATIVE_URLS": true,
+    "OUTPUT_PATH": "www"
   }
 }

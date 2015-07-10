@@ -7,7 +7,7 @@ import datetime
 
 
 class EverdownStore(enml.MediaStore):
-    files_dir = 'files'
+    files_dir = 'everdown/files'
 
     def __init__(self, note_store, note_guid, note_root):
         super(EverdownStore, self).__init__(note_store, note_guid)
