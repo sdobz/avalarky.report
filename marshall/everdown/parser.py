@@ -7,37 +7,42 @@ import datetime
 
 
 class EverdownStore(enml.MediaStore):
-    files_dir = 'everdown/files'
-
-    def __init__(self, note_store, note_guid, note_root):
+    def __init__(self, note_store, note_guid, html_path, file_path):
         super(EverdownStore, self).__init__(note_store, note_guid)
-        self.file_root = path.join(note_root, self.files_dir)
+        self.html_path = html_path
+        self.file_path = file_path
 
     def save(self, hash_str, mime_type):
         """
         save the specified hash and return the saved file's URL
         """
-        if not path.exists(self.file_root):
-            os.makedirs(self.file_root)
         data = self._get_resource_by_hash(hash_str)
         filename = hash_str + enml.MIME_TO_EXTESION_MAPPING[mime_type]
 
+        if not path.exists(self.file_path):
+            os.makedirs(self.file_path)
+
         # Files are written relative to content_root
-        with open(path.join(self.file_root, filename), "w") as f:
+        with open(path.join(self.file_path, filename), "w") as f:
             f.write(data)
 
         # The resource path is returned into img tags
-        return path.join(self.files_dir, filename)
+        return path.join(self.html_path, filename)
 
 
 format_timestamp = lambda ms: datetime.datetime.fromtimestamp(ms/1000).strftime('%Y-%m-%d %H:%M')
 
 
-def save_note(note, note_store, output, notebook):
+def save_note(note, note_store, content_path, notebook, html_path, file_path):
     notebook_slug = slugify(notebook.name)
     note_slug = slugify(unicode(note.title))
-    note_root = path.join(output, notebook_slug, note_slug)
-    media_store = EverdownStore(note_store, note.guid, note_root=note_root)
+    # TODO: Bad code, magical variable reformatting
+    path_map = {
+        'notebook': notebook_slug,
+        'note': note_slug
+    }
+    content_path = content_path.format(**path_map)
+    media_store = EverdownStore(note_store, note.guid, html_path.format(**path_map), file_path.format(**path_map))
 
     content_soup = BeautifulSoup('<html><head><title>{}</title></head><body></body></html>'.format(note.title), features='html.parser')
 
@@ -56,5 +61,8 @@ def save_note(note, note_store, output, notebook):
 
     content_soup.body.append(note_soup)
 
-    with open(path.join(note_root, 'index.html'), 'w') as f:
+    if not path.exists(content_path):
+        os.makedirs(content_path)
+
+    with open(path.join(content_path, 'index.html'), 'w') as f:
         f.write(content_soup.prettify().encode('utf-8'))

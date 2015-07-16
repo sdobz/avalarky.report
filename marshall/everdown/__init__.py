@@ -15,8 +15,10 @@ def run(settings):
     log.info('Starting run')
 
     token = settings['token']
-    output = settings['output']
     cache_file = settings['cache']
+    content_path = settings['content path']
+    file_path = settings['file path']
+    html_path = settings['html path']
 
     notebook_filters = [
         re.compile(fnmatch.translate(filter_glob)) for filter_glob in settings['notebooks']
@@ -36,14 +38,14 @@ def run(settings):
                     cache = pickle.load(fh)
             else:
                 cache = {}
-            unchanged_notes += save_if_stale(cache, note_metadata, note_store, output, notebook)
+            unchanged_notes += save_if_stale(cache, note_metadata, note_store, content_path, notebook, html_path, file_path)
             with open(cache_file, 'wb') as fh:
                 pickle.dump(cache, fh)
 
         log.info('Skipped {} unchanged notes'.format(unchanged_notes))
 
 
-def save_if_stale(cache, new_note, note_store, output, notebook):
+def save_if_stale(cache, new_note, note_store, content_path, notebook, html_path, file_path):
     unchanged_notes = 0
     note_guid = new_note.guid
 
@@ -55,7 +57,7 @@ def save_if_stale(cache, new_note, note_store, output, notebook):
         cache[note_guid] = new_note
         log.info('Saving fresh note: {}'.format(new_note.title))
 
-        save_note(new_note, note_store, output, notebook)
+        save_note(new_note, note_store, content_path, notebook, html_path, file_path)
         log.info('Wrote note')
     else:
         unchanged_notes += 1
