@@ -4,7 +4,8 @@
     "cache": "cache/everdown.pickle",
     "content path": "content/everdown/{notebook}/{note}",
     "file path": "content/everdown/{notebook}/{note}/files",
-    "html path": "everdown/{notebook}/{note}/files",
+    "html path": "/everdown/{notebook}/{note}/files",
+    "google api key": "AIzaSyArgI9GRJImLRiglPntqoMIHAqBcUHTlSA",
     "notebooks": [
       "mo*"
     ]
@@ -13,7 +14,7 @@
     "AUTHOR": "Vincent Khougaz",
     "SITENAME": "Avalarky Report",
     "SITEURL": "avalarky.report",
-    "THEME": "marshall/pelican/themes/pelican-neat/neat",
+    "THEME": "marshall/pelican/themes/avalarky_report",
     "PATH": "content",
     "STATIC_PATHS": [""],
     "CACHE_PATH": "cache/pelican",

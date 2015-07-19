@@ -1,7 +1,8 @@
 import ENML2HTML as enml
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 from os import path
 import os
+import re
 from .util import slugify
 import datetime
 
@@ -33,16 +34,16 @@ class EverdownStore(enml.MediaStore):
 format_timestamp = lambda ms: datetime.datetime.fromtimestamp(ms/1000).strftime('%Y-%m-%d %H:%M')
 
 
-def save_note(note, note_store, content_path, notebook, html_path, file_path):
-    notebook_slug = slugify(notebook.name)
+def save_note(note, note_info, note_paths):
+    notebook_slug = slugify(note_info.notebook.name)
     note_slug = slugify(unicode(note.title))
     # TODO: Bad code, magical variable reformatting
     path_map = {
         'notebook': notebook_slug,
         'note': note_slug
     }
-    content_path = content_path.format(**path_map)
-    media_store = EverdownStore(note_store, note.guid, html_path.format(**path_map), file_path.format(**path_map))
+    content_path = note_paths.content.format(**path_map)
+    media_store = EverdownStore(note_info.store, note.guid, note_paths.html.format(**path_map), note_paths.file.format(**path_map))
 
     content_soup = BeautifulSoup('<html><head><title>{}</title></head><body></body></html>'.format(note.title), features='html.parser')
 
@@ -52,12 +53,22 @@ def save_note(note, note_store, content_path, notebook, html_path, file_path):
         content_soup.head.append(new_tag)
 
     add_meta_tag('slug', note_slug)
-    add_meta_tag('category', notebook.name)
+    add_meta_tag('category', note_info.notebook.name)
     add_meta_tag('date', format_timestamp(note.created))
     add_meta_tag('modified', format_timestamp(note.updated))
 
+    if note.attributes.latitude is not None and note.attributes.longitude is not None:
+        add_meta_tag('city', note_info.get_city(note.attributes.latitude, note.attributes.longitude))
+
     note_soup = BeautifulSoup(enml.ENMLToHTML(note.content, media_store=media_store, header=False, pretty=False), 'html.parser')
     note_soup.div['class'] = 'note'
+
+    tags = linkify_soup(note_soup, note_soup.new_tag)
+    add_meta_tag('tags', u', '.join(tags))
+
+    first_img = note_soup.find('img')
+    if first_img:
+        add_meta_tag('promoted-image', first_img.attrs['src'])
 
     content_soup.body.append(note_soup)
 
@@ -66,3 +77,38 @@ def save_note(note, note_store, content_path, notebook, html_path, file_path):
 
     with open(path.join(content_path, 'index.html'), 'w') as f:
         f.write(content_soup.prettify().encode('utf-8'))
+
+
+tag_re = re.compile('(#\w+)')
+
+
+def linkify_soup(soup, new_tag):
+    assert hasattr(soup, 'contents')
+    tags = set()
+    old_elements = [e for e in soup.contents]
+    for element in old_elements:
+        if not isinstance(element, NavigableString):
+            tags = tags.union(linkify_soup(element, new_tag))
+            continue
+
+        segments = tag_re.split(element)
+
+        if len(segments) <= 1:
+            continue
+
+        insertion_target = element
+
+        for segment in segments:
+            if len(segment) > 0:
+                if tag_re.match(segment) is None:
+                    new_e = NavigableString(segment)
+                else:
+                    new_e = new_tag("a", href="#")
+                    new_e.string = segment
+                    tags.add(segment[1:])
+                insertion_target.insert_after(new_e)
+                insertion_target = new_e
+
+        element.extract()
+
+    return tags
