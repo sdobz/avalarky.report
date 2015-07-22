@@ -44,5 +44,8 @@
   <div class="entry-content">
     {{ article.content }}
   </div><!-- /.entry-content -->
+  <div class="comments">
+    {% include 'disqus.html' %}
+  </div>
 </section>
 {% endblock %}

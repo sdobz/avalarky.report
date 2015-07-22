@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import ENML2HTML as enml
 from bs4 import BeautifulSoup, NavigableString
 from os import path
@@ -5,6 +6,7 @@ import os
 import re
 from .util import slugify
 import datetime
+from pelican.urlwrappers import Tag
 
 
 class EverdownStore(enml.MediaStore):
@@ -34,7 +36,7 @@ class EverdownStore(enml.MediaStore):
 format_timestamp = lambda ms: datetime.datetime.fromtimestamp(ms/1000).strftime('%Y-%m-%d %H:%M')
 
 
-def save_note(note, note_info, note_paths):
+def save_note(note, note_info, note_paths, pelican_settings):
     notebook_slug = slugify(note_info.notebook.name)
     note_slug = slugify(unicode(note.title))
     # TODO: Bad code, magical variable reformatting
@@ -63,12 +65,14 @@ def save_note(note, note_info, note_paths):
     note_soup = BeautifulSoup(enml.ENMLToHTML(note.content, media_store=media_store, header=False, pretty=False), 'html.parser')
     note_soup.div['class'] = 'note'
 
-    tags = linkify_soup(note_soup, note_soup.new_tag)
+    tags = linkify_soup(note_soup, note_soup.new_tag, pelican_settings)
     add_meta_tag('tags', u', '.join(tags))
+
+    add_meta_tag('summary', get_summary(note_soup, 120))
 
     first_img = note_soup.find('img')
     if first_img:
-        add_meta_tag('promoted-image', first_img.attrs['src'])
+        add_meta_tag('promoted_image', first_img.attrs['src'])
 
     content_soup.body.append(note_soup)
 
@@ -79,16 +83,24 @@ def save_note(note, note_info, note_paths):
         f.write(content_soup.prettify().encode('utf-8'))
 
 
+def get_summary(soup, summary_length):
+    word_list = soup.get_text(separator=u' ').strip().replace(u'\n', u'—').split()
+    summary = ''
+    while len(summary) < summary_length and len(word_list) > 0:
+        summary += ' ' + word_list.pop(0)
+    return summary.strip()
+
+
 tag_re = re.compile('(#\w+)')
 
 
-def linkify_soup(soup, new_tag):
+def linkify_soup(soup, new_tag, pelican_settings):
     assert hasattr(soup, 'contents')
     tags = set()
     old_elements = [e for e in soup.contents]
     for element in old_elements:
         if not isinstance(element, NavigableString):
-            tags = tags.union(linkify_soup(element, new_tag))
+            tags = tags.union(linkify_soup(element, new_tag, pelican_settings))
             continue
 
         segments = tag_re.split(element)
@@ -103,7 +115,9 @@ def linkify_soup(soup, new_tag):
                 if tag_re.match(segment) is None:
                     new_e = NavigableString(segment)
                 else:
-                    new_e = new_tag("a", href="#")
+                    tag = Tag(segment, pelican_settings)
+                    # This is how pelican does tag urls...
+                    new_e = new_tag("a", href=pelican_settings['SITEURL'] + '/' + tag.url)
                     new_e.string = segment
                     tags.add(segment[1:])
                 insertion_target.insert_after(new_e)

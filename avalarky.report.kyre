@@ -8,13 +8,22 @@
     "google api key": "AIzaSyArgI9GRJImLRiglPntqoMIHAqBcUHTlSA",
     "notebooks": [
       "mo*"
-    ]
+    ],
+    "rebuild notes": true
   },
   "pelican": {
     "AUTHOR": "Vincent Khougaz",
-    "SITENAME": "Avalarky Report",
-    "SITEURL": "avalarky.report",
-    "THEME": "marshall/pelican/themes/avalarky_report",
+    "SITENAME": "avalarky.report",
+    "SITEURL": "http://avalarky.report",
+    "PROMOTED_IMAGE": "http://placehold.it/300x200",
+    "SOCIAL": [
+      ["/vincent.khougaz", "https://facebook.com/vincent.khougaz"],
+      ["@sdo.bz", "https://twitter.com/sdobz"]
+    ],
+    "DISQUS_SHORTNAME": "avalarkyreport",
+    "GOOGLE_ANALYTICS": "UA-65403321-1",
+    "THEME": "marshall/pelican/themes/avalarky_report/",
+    "CSS_FILE": "theme.css",
     "PATH": "content",
     "STATIC_PATHS": [""],
     "CACHE_PATH": "cache/pelican",
@@ -25,24 +34,14 @@
     "TRANSLATION_FEED_ATOM": null,
     "AUTHOR_FEED_ATOM": null,
     "AUTHOR_FEED_RSS": null,
-    "LINKS": [
-      [
-        "You can modify those links in your config file",
-        "#"
-      ]
-    ],
-    "SOCIAL": [
-      [
-        "You can add links in your config file",
-        "#"
-      ],
-      [
-        "Another social link",
-        "#"
-      ]
-    ],
+    "DISPLAY_CATEGORIES_ON_MENU": true,
     "DEFAULT_PAGINATION": 20,
     "RELATIVE_URLS": true,
     "OUTPUT_PATH": "www"
+  },
+  "s3": {
+    "bucket": "avalarky.report",
+    "access-key-id": "AKIAJCGX4Y5MSGQYBMOA",
+    "secret-access-key": "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"
   }
 }

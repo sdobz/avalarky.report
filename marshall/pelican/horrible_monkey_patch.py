@@ -10,8 +10,12 @@ def combine(d1, d2):
     return d3
 
 
+def initialize_settings(settings):
+    return configure_settings(combine(DEFAULT_CONFIG, settings))
+
+
 def patch_pelican_settings(settings_without_default):
-    settings = configure_settings(combine(DEFAULT_CONFIG, settings_without_default))
+    settings = initialize_settings(settings_without_default)
 
     def get_instance(_):
         cls = settings['PELICAN_CLASS']
@@ -23,3 +27,4 @@ def patch_pelican_settings(settings_without_default):
         return cls(settings), settings
 
     pelican.get_instance = get_instance
+    return settings

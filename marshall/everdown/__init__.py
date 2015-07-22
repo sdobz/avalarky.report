@@ -15,7 +15,8 @@ log = logging.getLogger(__name__)
 NoteInfo = namedtuple('NoteInfo', 'metadata notebook store token get_city')
 NotePaths = namedtuple('NotePaths', 'content html file')
 
-def run(settings):
+
+def run(settings, pelican_settings):
     log.info('Starting run')
 
     token = settings['token']
@@ -25,8 +26,10 @@ def run(settings):
         file=settings['file path'],
         html=settings['html path']
     )
-    get_city = create_get_city(settings['google api key'])
-    # google_places = GooglePlaces(settings['google api key'])
+    if 'google api key' in settings:
+        get_city = create_get_city(settings['google api key'])
+    else:
+        get_city = lambda lat, lon: ''
 
     notebook_filters = [
         re.compile(fnmatch.translate(filter_glob)) for filter_glob in settings['notebooks']
@@ -46,28 +49,32 @@ def run(settings):
                     cache = pickle.load(fh)
             else:
                 cache = {}
-            unchanged_notes += save_if_stale(cache, note_info, note_paths)
+            unchanged_notes += save_if_stale(cache, note_info, note_paths, settings, pelican_settings)
             if cache_file:
                 with open(cache_file, 'wb') as fh:
                     pickle.dump(cache, fh)
 
-        log.info('Skipped {} unchanged notes'.format(unchanged_notes))
+        if unchanged_notes > 0:
+            log.info('Skipped {} unchanged notes'.format(unchanged_notes))
 
 
-def save_if_stale(cache, note_info, note_paths):
+def save_if_stale(cache, note_info, note_paths, settings, pelican_settings):
     unchanged_notes = 0
     note_guid = note_info.metadata.guid
 
-    old_note = cache[note_guid] if note_guid in cache else None
+    note = cache[note_guid] if note_guid in cache else None
+    new_note = None
 
-    if old_note is None or old_note.updated < note_info.metadata.updated or True:
+    if note is None or note.updated < note_info.metadata.updated:
         log.info('Retrieving stale or missing note {}'.format(note_guid))
-        new_note = note_info.store.getNote(note_guid, True, True, True, True)
-        cache[note_guid] = new_note
-        log.info('Saving fresh note: {}'.format(new_note.title))
+        note = note_info.store.getNote(note_guid, True, True, True, True)
+        cache[note_guid] = note
+        new_note = True
+        log.info('Fetched'.format(note.title))
 
-        save_note(new_note, note_info, note_paths)
-        log.info('Wrote note')
+    if settings['rebuild notes'] or new_note:
+        save_note(note, note_info, note_paths, pelican_settings)
+        log.info('Wrote note: {}'.format(note.title))
     else:
         unchanged_notes += 1
     return unchanged_notes
