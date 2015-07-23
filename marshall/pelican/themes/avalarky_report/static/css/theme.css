@@ -1,0 +1,42 @@
+#index-wrapper {
+    width: 800px;
+    margin: 0 auto;
+}
+
+#banner {
+    height: 3em;
+}
+
+#banner a {
+    text-decoration: none;
+}
+
+#banner h1 {
+    display: inline;
+}
+
+#menu {
+    display: inline;
+}
+
+#menu ul {
+    display: inline;
+}
+
+#menu li  {
+    display: inline;
+}
+
+#content {
+    width: 600px;
+    float: left;
+}
+
+#sidebar {
+    width: 200px;
+    float: right;
+}
+
+footer {
+    clear: both;
+}

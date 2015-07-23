@@ -108,7 +108,7 @@ def replace_media_tags(soup, note, note_store, html_path, file_path, add_meta_ta
 
         save_media(resource_hash, note_store, note.guid, outputs)
 
-        anchor = soup.new_tag('a', href=path.join(html_path, full_filename), rel="simplebox")
+        anchor = soup.new_tag('a', href=path.join(html_path, full_filename), target='_blank')
         img = soup.new_tag('img', src=path.join(html_path, scaled_filename))
         anchor.append(img)
 

@@ -4,6 +4,7 @@
   {% block head %}
   <title>{% block title %}{{ SITENAME }}{% endblock title %}</title>
   <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/{{ CSS_FILE }}"/>
+  <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/vendor/normalize.css"/>
   <meta charset="utf-8"/>
   {% if FEED_ALL_ATOM %}
   <link href="{{ FEED_DOMAIN }}/{{ FEED_ALL_ATOM }}" type="application/atom+xml" rel="alternate"
@@ -41,31 +42,32 @@
 </head>
 
 <body id="index" class="home">
+<div id="index-wrapper">
 <header id="banner" class="body">
   <h1><a href="{{ SITEURL }}/">{{ SITENAME }}</a></h1>
+  <nav id="menu">
+    <ul>
+      {% for title, link in MENUITEMS %}
+        <li><a href="{{ link }}">{{ title }}</a></li>
+      {% endfor %}
+      {% if DISPLAY_CATEGORIES_ON_MENU %}
+        {% for cat, null in categories %}
+          <li{% if cat == category %} class="active"{% endif %}><a href="{{ SITEURL }}/{{ cat.url }}">{{ cat }}</a></li>
+        {% endfor %}
+      {% endif %}
+      {% if DISPLAY_PAGES_ON_MENU %}
+        {% for p in PAGES %}
+          <li{% if p == page %} class="active"{% endif %}><a href="{{ SITEURL }}/{{ p.url }}">{{ p.title }}</a></li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+  </nav>
+  <!-- /#menu -->
 </header>
 <!-- /#banner -->
-<nav id="menu">
-  <ul>
-    {% for title, link in MENUITEMS %}
-      <li><a href="{{ link }}">{{ title }}</a></li>
-    {% endfor %}
-    {% if DISPLAY_CATEGORIES_ON_MENU %}
-      {% for cat, null in categories %}
-        <li{% if cat == category %} class="active"{% endif %}><a href="{{ SITEURL }}/{{ cat.url }}">{{ cat }}</a></li>
-      {% endfor %}
-    {% endif %}
-    {% if DISPLAY_PAGES_ON_MENU %}
-      {% for p in PAGES %}
-        <li{% if p == page %} class="active"{% endif %}><a href="{{ SITEURL }}/{{ p.url }}">{{ p.title }}</a></li>
-      {% endfor %}
-    {% endif %}
-  </ul>
-</nav>
-<!-- /#menu -->
-{% block content %}
-{% endblock %}
 {% block sidebar %}
+{% endblock %}
+{% block content %}
 {% endblock %}
 <footer id="contentinfo" class="body">
   <address id="about" class="vcard body">
@@ -73,6 +75,7 @@
   </address>
   <!-- /#about -->
 </footer>
+</div>
 {% include 'analytics.html' %}
 <!-- /#contentinfo -->
 </body>
