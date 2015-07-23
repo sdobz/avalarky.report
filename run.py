@@ -13,10 +13,10 @@ from marshall.pelican.horrible_monkey_patch import patch_pelican_settings
 pelican_settings = patch_pelican_settings(settings['pelican'])
 
 from marshall.everdown import run as everdown_run
-#everdown_run(settings['everdown'], pelican_settings)
+everdown_run(settings['everdown'], pelican_settings)
 
 from pelican import main
 main()
 
 from deploy import s3
-#s3.upload(settings['s3'], settings['pelican']['OUTPUT_PATH'])
+s3.upload(settings['s3'], settings['pelican']['OUTPUT_PATH'])

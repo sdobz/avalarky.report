@@ -34,6 +34,7 @@ def upload(settings, source):
             key = bucket.get_key(key_str)
             if key is None or file_hash(relpath) != key.etag.strip('"'):
                 k = Key(bucket)
+                k.key = key_str
                 k.set_contents_from_filename(relpath)
                 k.set_acl('public-read')
                 log.info('S3: Uploaded {}'.format(file))
