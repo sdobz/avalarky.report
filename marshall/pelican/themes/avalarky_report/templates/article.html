@@ -16,6 +16,11 @@
 {% endblock %}
 
 {% block content %}
+{% if article.hero_image %}
+<section id="hero">
+  <img src="{{ article.hero_image }}" alt="First image in article"/>
+</section>
+{% endif %}
 <section id="content" class="body">
   <header>
     <h2 class="entry-title">

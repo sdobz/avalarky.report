@@ -9,8 +9,8 @@
     {% for article in articles_page.object_list %}
     <li>
       <article class="hentry">
-        {% if article.promoted_image %}
-          <img src="{{ article.promoted_image }}" alt="Promoted image for {{ article.title|striptags }}"/>
+        {% if article.thumbnail_image %}
+          <img src="{{ article.thumbnail_image }}" alt="Thumbnail image for {{ article.title|striptags }}"/>
         {% endif %}
         <header><h2 class="entry-title"><a href="{{ SITEURL }}/{{ article.url }}" rel="bookmark"
                                            title="Permalink to {{ article.title|striptags }}">{{ article.title }}</a>

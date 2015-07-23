@@ -1,5 +1,0 @@
-#!/bin/bash
-
-rm -r output
-rm -r site-gen/cache
-rm -r site-gen/content

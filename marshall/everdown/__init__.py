@@ -9,7 +9,7 @@ from .util import slugify
 from .parser import save_note
 from .geolocate import create_get_city
 import logging
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 log = logging.getLogger(__name__)
 
 NoteInfo = namedtuple('NoteInfo', 'metadata notebook store token get_city')
@@ -19,7 +19,13 @@ NotePaths = namedtuple('NotePaths', 'content html file')
 def run(settings, pelican_settings):
     log.info('Starting run')
 
-    token = settings['token']
+    if settings['sandbox']:
+        token = settings['token-sandbox']
+        sandbox = True
+    else:
+        token = settings['token']
+        sandbox = False
+
     cache_file = settings['cache']
     note_paths = NotePaths(
         content=settings['content path'],
@@ -35,7 +41,7 @@ def run(settings, pelican_settings):
         re.compile(fnmatch.translate(filter_glob)) for filter_glob in settings['notebooks']
     ]
 
-    client = EvernoteClient(token=token)
+    client = EvernoteClient(token=token, sandbox=sandbox)
     note_store = client.get_note_store()
     notebooks = get_notebooks(note_store)
 

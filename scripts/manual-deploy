@@ -1,6 +1,0 @@
-#!/bin/bash
-
-cd generator
-fab build
-cd ..
-aws s3 sync --delete --acl public-read www s3://avalarky.report

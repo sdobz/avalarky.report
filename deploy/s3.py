@@ -1,8 +1,9 @@
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 import os
-import logging
 import ssl
+import hashlib
+import logging
 log = logging.getLogger(__name__)
 
 
@@ -18,6 +19,10 @@ def monkey_patch_ssl():
     ssl.match_hostname = _new_match_hostname
 
 
+def file_hash(f):
+    return hashlib.md5(open(f, 'rb').read()).hexdigest()
+
+
 def upload(settings, source):
     monkey_patch_ssl()
     s3 = S3Connection(settings['access-key-id'], settings['secret-access-key'])
@@ -25,8 +30,12 @@ def upload(settings, source):
     for path, dir, files in os.walk(source):
         for file in files:
             relpath = os.path.relpath(os.path.join(path, file))
-            k = Key(bucket)
-            k.key = relpath[len(source)+1:]
-            k.set_contents_from_filename(relpath)
-            k.set_acl('public-read')
-            log.info('S3: Uploaded {}'.format(file))
+            key_str = relpath[len(source)+1:]
+            key = bucket.get_key(key_str)
+            if key is None or file_hash(relpath) != key.etag.strip('"'):
+                k = Key(bucket)
+                k.set_contents_from_filename(relpath)
+                k.set_acl('public-read')
+                log.info('S3: Uploaded {}'.format(file))
+            else:
+                log.info('S3: Skipped {}'.format(file))
