@@ -27,7 +27,12 @@
     "THEME": "marshall/pelican/themes/avalarky_report/",
     "CSS_FILE": "theme.css",
     "PATH": "content",
-    "STATIC_PATHS": [""],
+    "STATIC_PATHS": ["extra/favicon.ico", "everdown"],
+    "EXTRA_PATH_METADATA": {
+      "extra/favicon.ico": {
+        "path": "favicon.ico"
+      }
+    },
     "CACHE_PATH": "cache/pelican",
     "TIMEZONE": "America/Los_Angeles",
     "DEFAULT_LANG": "en",
