@@ -36,7 +36,9 @@
       <article class="hentry">
         <div class="teaser-image">
           {% if article.thumbnail_image %}
-            <img src="{{ article.thumbnail_image }}" alt="Thumbnail image for {{ article.title|striptags }}"/>
+            <a href="{{ SITEURL }}/{{ article.url }}">
+              <img src="{{ article.thumbnail_image }}" alt="Thumbnail image for {{ article.title|striptags }}"/>
+            </a>
           {% endif %}
         </div>
         <div class="teaser-content">
