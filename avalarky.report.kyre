@@ -19,8 +19,10 @@
     "SITEURL": "http://avalarky.report",
     "PROMOTED_IMAGE": "http://placehold.it/300x200",
     "SOCIAL": [
-      ["/vincent.khougaz", "https://facebook.com/vincent.khougaz"],
-      ["@sdo.bz", "https://twitter.com/sdobz"]
+      ["mail", "mailto:vincent@khougaz.com"],
+      ["facebook", "https://facebook.com/vincent.khougaz"],
+      ["twitter", "https://twitter.com/sdobz"],
+      ["linkedin", "https://www.linkedin.com/pub/vincent-khougaz/53/915/71b"]
     ],
     "DISQUS_SHORTNAME": "avalarkyreport",
     "GOOGLE_ANALYTICS": "UA-65403321-1",

@@ -10,7 +10,7 @@ gulp.task('sass', function () {
     .pipe(prefixer())
     .pipe(minify())
     .pipe(rename('theme.css'))
-    .pipe(gulp.dest('../css'));
+    .pipe(gulp.dest('../static/css'));
 });
 
 gulp.task('default', function() {
