@@ -11,7 +11,7 @@
     "notebooks": [
       "mo*"
     ],
-    "rebuild notes": true
+    "rebuild notes": false
   },
   "pelican": {
     "AUTHOR": "Vincent Khougaz",
@@ -44,7 +44,9 @@
     "DISPLAY_CATEGORIES_ON_MENU": true,
     "DEFAULT_PAGINATION": 20,
     "RELATIVE_URLS": true,
-    "OUTPUT_PATH": "www"
+    "OUTPUT_PATH": "www",
+    "ARTICLE_URL": "article/{slug}.html",
+    "ARTICLE_SAVE_AS": "article/{slug}.html"
   },
   "s3": {
     "bucket": "avalarky.report",
