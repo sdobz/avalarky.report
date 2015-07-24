@@ -27,7 +27,26 @@
   }
 }
 .entry-content{
+  .note div {
+    float: left;
+    width: 100%;
+  }
   img{
+    padding: 2rem 0;
+  }
+}
+
+// Repsonsive styles begin
+@media #{$medium} {
+  #details{
+    width: 100%;
+    padding: 2rem 0;
+  }
+}
+
+@media #{$small} {
+  #details{
+    width: 100%;
     padding: 2rem 0;
   }
 }

@@ -53,3 +53,24 @@ article{
     }
   }
 }
+
+// Repsonsive styles begin
+@media #{$medium} {
+  article .teaser-image{
+    width: 100px;
+  }
+  .teaser-content{
+    width: calc(100% - 100px);
+  }
+}
+
+@media #{$small} {
+  article{
+    .teaser-image{
+      display: none;
+    }
+    .teaser-content{
+      width: 100%;
+    }
+  }
+}
