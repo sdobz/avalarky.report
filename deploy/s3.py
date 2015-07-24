@@ -40,3 +40,9 @@ def upload(settings, source):
                 log.info('S3: Uploaded {}'.format(file))
             else:
                 log.info('S3: Skipped {}'.format(file))
+
+    for key in bucket.list():
+        local_filename = os.path.join(source, key.key)
+        if not os.path.exists(local_filename):
+            bucket.delete_key(key.key)
+            log.info('{} does not exist locally, removed from s3'.format(key.key))
