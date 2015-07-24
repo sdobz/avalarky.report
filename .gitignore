@@ -4,3 +4,4 @@ secret
 env
 cache
 www
+marshall/pelican/themes/avalarky_report/gulp/node_modules
