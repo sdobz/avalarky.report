@@ -53,7 +53,8 @@ def save_note(note, note_info, note_paths, pelican_settings):
     replace_media_tags(soup, note, note_info.store, html_path, file_path, add_meta_tag)
 
     if note.attributes.latitude is not None and note.attributes.longitude is not None:
-        add_meta_tag('city', note_info.get_city(note.attributes.latitude, note.attributes.longitude))
+        place = note_info.get_place(note.attributes.latitude, note.attributes.longitude)
+        add_meta_tag('city', place.formatted_address)
 
     tags = linkify_soup(soup, soup.new_tag, pelican_settings)
     add_meta_tag('tags', u', '.join(tags))

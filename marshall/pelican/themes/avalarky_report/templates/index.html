@@ -45,7 +45,9 @@
           <header><h2 class="entry-title"><a href="{{ SITEURL }}/{{ article.url }}" rel="bookmark"
                                              title="Permalink to {{ article.title|striptags }}">{{ article.title }}</a>
           </h2></header>
-          <abbr class="published" title="{{ article.date.isoformat() }}"> {{ article.locale_date }} </abbr>
+          <div class="entry-info">
+            <a href="{{ article.category.url }}">{{ article.category }}</a> - <abbr class="published" title="{{ article.date.isoformat() }}"> {{ article.locale_date }} </abbr>
+          </div>
           <div class="entry-content"> {{ article.summary }}</div>
           <ul class="tags">
             {% for tag in article.tags %}

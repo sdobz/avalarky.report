@@ -7,12 +7,12 @@ import pickle
 from os import path
 from .util import slugify
 from .parser import save_note
-from .geolocate import create_get_city
+from .geolocate import create_get_place
 import logging
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 log = logging.getLogger(__name__)
 
-NoteInfo = namedtuple('NoteInfo', 'metadata notebook store token get_city')
+NoteInfo = namedtuple('NoteInfo', 'metadata notebook store token get_place')
 NotePaths = namedtuple('NotePaths', 'content html file')
 
 
@@ -32,10 +32,7 @@ def run(settings, pelican_settings):
         file=settings['file path'],
         html=settings['html path']
     )
-    if 'google api key' in settings:
-        get_city = create_get_city(settings['google api key'])
-    else:
-        get_city = lambda lat, lon: ''
+    get_place = create_get_place(settings['google api key'])
 
     notebook_filters = [
         re.compile(fnmatch.translate(filter_glob)) for filter_glob in settings['notebooks']
@@ -49,7 +46,7 @@ def run(settings, pelican_settings):
         log.info('Checking {}'.format(notebook.name))
         unchanged_notes = 0
 
-        for note_info in get_note_info(notebook, note_store, token, get_city):
+        for note_info in get_note_info(notebook, note_store, token, get_place):
             if cache_file and path.exists(cache_file):
                 with open(cache_file) as fh:
                     cache = pickle.load(fh)
@@ -102,7 +99,7 @@ def filter_notebooks(notebooks, notebook_filters):
     return passed_notebooks
 
 
-def get_note_info(notebook, note_store, token, get_city):
+def get_note_info(notebook, note_store, token, get_place):
     updated_filter = NoteFilter(notebookGuid=notebook.guid)
     offset = 0
     max_notes = 10
@@ -113,7 +110,7 @@ def get_note_info(notebook, note_store, token, get_city):
             notebook=notebook,
             store=note_store,
             token=token,
-            get_city=get_city
+            get_place=get_place
         )
         for metadata in note_store.findNotesMetadata(token, updated_filter, offset, max_notes, result_spec).notes)
 
