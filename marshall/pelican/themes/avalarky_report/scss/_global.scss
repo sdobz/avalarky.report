@@ -57,6 +57,9 @@ img{
       float: left;
       padding: .408rem 0 .408rem 1rem;
     }
+    a.active {
+      font-weight: bold;
+    }
   }
 }
 
@@ -83,6 +86,9 @@ img{
     float: left;
     width: 100%;
     padding: 2rem 0 0;
+  }
+  .tags a.active {
+    font-weight: bold;
   }
 }
 

@@ -51,7 +51,7 @@
           </div>
           <div class="entry-content"> {{ article.summary }}</div>
           <div class="entry-tags">
-            <a href="{{ article.category.url }}">{{ article.category }}</a>
+            <a href="{{ SITEURL }}/{{ article.category.url }}">{{ article.category }}</a>
             {% if article.tags %}
             -
             {% endif %}
