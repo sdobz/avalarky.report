@@ -21,20 +21,20 @@
     <img src="{{ article.hero_image }}" alt="First image in article"/>
   </section>
 {% endif %}
-<section id="sidebar">
+<section id="details">
   <ul>
-    <li>
-      Posted:
+    <li class="info">
+      <label>Posted:</label>
       <abbr class="published" title="{{ article.date.isoformat() }}">{{ article.locale_date }} </abbr>
     </li>
     {% if article.modified and article.modified != article.date %}
-    <li>
-      Modified:
+    <li class="info">
+      <label>Modified:</label>
       <abbr class="modified" title="{{ article.modified.isoformat() }}">{{ article.locale_modified }} </abbr>
     </li>
     {% endif %}
     {% if article.city %}
-    <li>Near: {{ article.city }}</li>
+    <li class="info"><label>Near:</label> {{ article.city }}</li>
     {% endif %}
     {% if article.authors %}
       <address class="vcard author">

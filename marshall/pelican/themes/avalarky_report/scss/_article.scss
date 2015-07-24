@@ -1,1 +1,33 @@
 // Article pages
+#details {
+  width: 200px;
+  float: right;
+  padding: 2rem 0 0 2rem;
+  label{
+    display: block;
+    font-size: 11px;
+    color: $gray;
+  }
+  li{
+    font-size: 14px;
+    list-style: none;
+    padding: 0 0 .5rem;
+    &.info{
+      padding: 0 0 1.25rem;
+    }
+  }
+  .tags,
+  .social{
+    float: left;
+    width: 100%;
+    padding: 2rem 0 0;
+  }
+  .author{
+    font-size: 14px;
+  }
+}
+.entry-content{
+  img{
+    padding: 2rem 0;
+  }
+}
