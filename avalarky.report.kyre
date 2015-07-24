@@ -48,7 +48,8 @@
     "RELATIVE_URLS": true,
     "OUTPUT_PATH": "www",
     "ARTICLE_URL": "article/{slug}.html",
-    "ARTICLE_SAVE_AS": "article/{slug}.html"
+    "ARTICLE_SAVE_AS": "article/{slug}.html",
+    "DELETE_OUTPUT_DIRECTORY": true
   },
   "s3": {
     "bucket": "avalarky.report",
