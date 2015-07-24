@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% block sidebar %}
+  {% block content_title %}
+  <div id="page-title">
+    <h2>All articles</h2>
+  </div>
+  {% endblock %}
   <section id="sidebar">
     <img src="{{ PROMOTED_IMAGE }}" />
     {% if SOCIAL or FEED_ALL_ATOM or FEED_ALL_RSS %}
@@ -25,27 +30,27 @@
 {% endblock sidebar %}
 {% block content %}
 <section id="content">
-  {% block content_title %}
-  <h2>All articles</h2>
-  {% endblock %}
-
   <ol id="post-list">
     {% for article in articles_page.object_list %}
     <li>
       <article class="hentry">
-        {% if article.thumbnail_image %}
-          <img src="{{ article.thumbnail_image }}" alt="Thumbnail image for {{ article.title|striptags }}"/>
-        {% endif %}
-        <header><h2 class="entry-title"><a href="{{ SITEURL }}/{{ article.url }}" rel="bookmark"
-                                           title="Permalink to {{ article.title|striptags }}">{{ article.title }}</a>
-        </h2></header>
-        <abbr class="published" title="{{ article.date.isoformat() }}"> {{ article.locale_date }} </abbr>
-        <div class="entry-content"> {{ article.summary }}</div>
-        <ul class="tags">
-          {% for tag in article.tags %}
-            <li><a href="{{ SITEURL }}/{{ tag.url }}">#{{ tag }}</a></li>
-          {% endfor %}
-        </ul>
+        <div class="teaser-image">
+          {% if article.thumbnail_image %}
+            <img src="{{ article.thumbnail_image }}" alt="Thumbnail image for {{ article.title|striptags }}"/>
+          {% endif %}
+        </div>
+        <div class="teaser-content">
+          <header><h2 class="entry-title"><a href="{{ SITEURL }}/{{ article.url }}" rel="bookmark"
+                                             title="Permalink to {{ article.title|striptags }}">{{ article.title }}</a>
+          </h2></header>
+          <abbr class="published" title="{{ article.date.isoformat() }}"> {{ article.locale_date }} </abbr>
+          <div class="entry-content"> {{ article.summary }}</div>
+          <ul class="tags">
+            {% for tag in article.tags %}
+              <li><a href="{{ SITEURL }}/{{ tag.url }}">#{{ tag }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
       </article>
     </li>
     {% endfor %}

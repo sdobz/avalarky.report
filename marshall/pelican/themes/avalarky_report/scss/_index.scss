@@ -1,1 +1,45 @@
 // Front page
+#content{
+  ol,
+  ul{
+    list-style: none;
+  }
+}
+article{
+  &.hentry{
+    float:left;
+    width: 100%;
+    padding: 0 1rem 2rem 0;
+    margin: 0 1rem 2rem 0;
+    border-right: 1px solid $gray;
+    border-bottom: 1px solid $gray;
+  }
+  .teaser-image{
+    float: left;
+    width: 200px;
+  }
+  .teaser-content{
+    float: left;
+    width: calc(100% - 200px);
+    padding: 0 1rem;
+    h2{
+      margin: 0 0 1.2rem;
+      line-height: 1;
+    }
+    .published{
+      float: left;
+      clear: both;
+      margin: 0 0 1.2rem;
+    }
+    .entry-content{
+      float: left;
+      width: 100%;
+      margin: 0 0 1.2rem;
+      line-height: 1.5;
+    }
+    .tags{
+      float: left;
+      width: 100%;
+    }
+  }
+}
