@@ -59,7 +59,7 @@ def save_note(note, note_info, note_paths, pelican_settings):
     tags = linkify_soup(soup, soup.new_tag, pelican_settings)
     add_meta_tag('tags', u', '.join(tags))
 
-    add_meta_tag('summary', get_summary(soup, 120))
+    add_meta_tag('summary', get_summary(note_soup, 120))
 
     if not path.exists(content_path):
         os.makedirs(content_path, mode=0755)
