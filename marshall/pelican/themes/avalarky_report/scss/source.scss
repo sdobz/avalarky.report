@@ -1,0 +1,9 @@
+@charset "UTF-8";
+
+// Vendor
+@import "normalize";
+
+// List of scss file in order of concatination
+@import "global";
+@import "index";
+@import "article";

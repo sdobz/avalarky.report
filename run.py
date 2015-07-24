@@ -19,4 +19,4 @@ from pelican import main
 main()
 
 from deploy import s3
-s3.upload(settings['s3'], settings['pelican']['OUTPUT_PATH'])
+#s3.upload(settings['s3'], settings['pelican']['OUTPUT_PATH'])
