@@ -26,25 +26,28 @@ article{
     width: calc(100% - 200px);
     padding: 0 1rem;
     h2{
-      margin: 0 0 1.2rem;
+      margin: 0 0 0.7rem;
       line-height: 1;
     }
     .entry-info{
       float: left;
       clear: both;
-      margin: 0 0 1.2rem;
+      margin: 0 0 1rem;
     }
     .entry-content{
       float: left;
       width: 100%;
-      margin: 0 0 1.2rem;
+      margin: 0 0 1rem;
       line-height: 1.5;
     }
-    .tags{
+    .entry-tags{
       float: left;
       width: 100%;
-      li{
+      ul {
         display: inline;
+        li{
+          display: inline;
+        }
       }
     }
   }

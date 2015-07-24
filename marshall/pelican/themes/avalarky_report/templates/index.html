@@ -46,14 +46,21 @@
                                              title="Permalink to {{ article.title|striptags }}">{{ article.title }}</a>
           </h2></header>
           <div class="entry-info">
-            <a href="{{ article.category.url }}">{{ article.category }}</a> - <abbr class="published" title="{{ article.date.isoformat() }}"> {{ article.locale_date }} </abbr>
+            <div class="city">{{ article.city }}</div>
+            <abbr class="published" title="{{ article.date.isoformat() }}"> {{ article.locale_date }} </abbr>
           </div>
           <div class="entry-content"> {{ article.summary }}</div>
-          <ul class="tags">
-            {% for tag in article.tags %}
-              <li><a href="{{ SITEURL }}/{{ tag.url }}">#{{ tag }}</a></li>
-            {% endfor %}
-          </ul>
+          <div class="entry-tags">
+            <a href="{{ article.category.url }}">{{ article.category }}</a>
+            {% if article.tags %}
+            -
+            {% endif %}
+            <ul>
+              {% for tag in article.tags %}
+                <li><a href="{{ SITEURL }}/{{ tag.url }}">#{{ tag }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
       </article>
     </li>
