@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block sidebar %}
-  {% block content_title %}
   <div id="page-title">
+    {% block content_title %}
     <h2>All articles</h2>
+    {% endblock %}
   </div>
-  {% endblock %}
   <section id="sidebar">
     <img src="{{ PROMOTED_IMAGE }}" />
     {% if SOCIAL or FEED_ALL_ATOM or FEED_ALL_RSS %}
