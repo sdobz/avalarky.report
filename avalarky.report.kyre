@@ -17,7 +17,6 @@
     "AUTHOR": "Vincent Khougaz",
     "SITENAME": "avalarky.report",
     "SITEURL": "http://avalarky.report",
-    "PROMOTED_IMAGE": "http://placehold.it/300x200",
     "SOCIAL": [
       ["mail", "mailto:vincent@khougaz.com"],
       ["facebook", "https://facebook.com/vincent.khougaz"],

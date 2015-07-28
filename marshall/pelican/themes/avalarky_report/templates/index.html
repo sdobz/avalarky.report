@@ -6,7 +6,9 @@
     {% endblock %}
   </div>
   <section id="sidebar">
-    <img src="{{ PROMOTED_IMAGE }}" />
+    <a href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/img/blog-pic.jpg">
+        <img src="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/img/blog-pic-small.jpg" />
+    </a>
     {% if SOCIAL or FEED_ALL_ATOM or FEED_ALL_RSS %}
       <ul class="social">
         {% if FEED_ALL_ATOM %}

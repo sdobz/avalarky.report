@@ -8,6 +8,8 @@ log = logging.getLogger(__name__)
 
 
 def monkey_patch_ssl():
+    if not hasattr(ssl, 'match_hostname'):
+        return
     _old_match_hostname = ssl.match_hostname
 
     def _new_match_hostname(cert, hostname):
