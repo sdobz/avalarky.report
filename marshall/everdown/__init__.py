@@ -76,7 +76,10 @@ def save_if_stale(cache, note_info, note_paths, settings, pelican_settings):
         log.info('Fetched'.format(note.title))
 
     if settings['rebuild notes'] or new_note:
-        save_note(note, note_info, note_paths, pelican_settings)
+        try:
+            save_note(note, note_info, note_paths, pelican_settings)
+        except BaseException as e:
+            log.error('Caught exception: {}'.format(e))
         log.info('Wrote note: {}'.format(note.title))
     else:
         unchanged_notes += 1
