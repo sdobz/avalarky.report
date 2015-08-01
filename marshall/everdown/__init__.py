@@ -107,14 +107,32 @@ def get_note_info(notebook, note_store, token, get_place):
     offset = 0
     max_notes = 10
     result_spec = NotesMetadataResultSpec(includeUpdated=True)
-    return (
-        NoteInfo(
-            metadata=metadata,
-            notebook=notebook,
-            store=note_store,
-            token=token,
-            get_place=get_place
-        )
-        for metadata in note_store.findNotesMetadata(token, updated_filter, offset, max_notes, result_spec).notes)
+    while True:
+        note_results = note_store.findNotesMetadata(token, updated_filter, offset, max_notes, result_spec)
+        for metadata in note_results.notes:
+            yield NoteInfo(
+                metadata=metadata,
+                notebook=notebook,
+                store=note_store,
+                token=token,
+                get_place=get_place
+            )
+        offset += max_notes
 
+        if offset > note_results.totalNotes:
+            break
 
+"""
+int offset = 0;
+int pageSize = 10;
+NotesMetadataList notes = null;
+
+do {
+	notes = noteStore.findNotesMetadata(authToken, filter, offset, pageSize, spec);
+	for (NoteMetadata note : notes.getNotes() {
+	// Do something with the notes we found
+	}
+	offset = offset + notes.getNotesSize();
+} while (notes.getTotalNotes() > offset);
+
+"""
