@@ -32,7 +32,10 @@ def save_note(note, note_info, note_paths, pelican_settings):
     note_soup['class'] = 'note'
     soup.body.append(note_soup)
 
+    meta_tags = {}
+
     def add_meta_tag(name, content):
+        meta_tags[name] = content
         new_tag = soup.new_tag('meta', content=content)
         new_tag['name'] = name
         soup.head.append(new_tag)
@@ -62,7 +65,16 @@ def save_note(note, note_info, note_paths, pelican_settings):
     tags = linkify_soup(soup, soup.new_tag, pelican_settings)
     add_meta_tag('tags', u', '.join(tags))
 
-    add_meta_tag('summary', get_summary(note_soup, 120))
+    summary = get_summary(note_soup, 120)
+    add_meta_tag('summary', summary)
+
+    # Facebook OG tags
+    add_meta_tag('og:title', note.title)
+    add_meta_tag('og:site_name', 'avalarky report')
+    add_meta_tag('og:description', summary)
+    add_meta_tag('og:type', 'article')
+    if 'hero_image' in meta_tags:
+        add_meta_tag('og:image', meta_tags['hero_image'])
 
     if not path.exists(content_path):
         os.makedirs(content_path, mode=0755)
