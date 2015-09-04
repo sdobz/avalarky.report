@@ -3,11 +3,10 @@ from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
 from collections import namedtuple
 import fnmatch
 import re
-import pickle
-from os import path
-from .util import slugify
+from .util import slugify, protect_rate_limit
 from .parser import save_note
 from .geolocate import create_get_place
+from .store import make_store
 import logging
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -26,20 +25,21 @@ def run(settings, pelican_settings):
         token = settings['token']
         sandbox = False
 
-    cache_file = settings['cache']
+    note_cache = make_store(settings['note cache'])
+    media_cache = make_store(settings['media cache'])
     note_paths = NotePaths(
         content=settings['content path'],
         file=settings['file path'],
         html=settings['html path']
     )
-    get_place = create_get_place(settings['google api key'])
+    get_place = create_get_place(settings['location'])
 
     notebook_filters = [
         re.compile(fnmatch.translate(filter_glob)) for filter_glob in settings['notebooks']
     ]
 
     client = EvernoteClient(token=token, sandbox=sandbox)
-    note_store = client.get_note_store()
+    note_store = protect_rate_limit(client.get_note_store)
     notebooks = get_notebooks(note_store)
 
     for notebook in filter_notebooks(notebooks, notebook_filters):
@@ -47,31 +47,23 @@ def run(settings, pelican_settings):
         unchanged_notes = 0
 
         for note_info in get_note_info(notebook, note_store, token, get_place):
-            if cache_file and path.exists(cache_file):
-                with open(cache_file) as fh:
-                    cache = pickle.load(fh)
-            else:
-                cache = {}
-            unchanged_notes += save_if_stale(cache, note_info, note_paths, settings, pelican_settings)
-            if cache_file:
-                with open(cache_file, 'wb') as fh:
-                    pickle.dump(cache, fh)
+            unchanged_notes += save_if_stale(note_cache, media_cache, note_info, note_paths, settings, pelican_settings)
 
         if unchanged_notes > 0:
             log.info('Skipped {} unchanged notes'.format(unchanged_notes))
 
 
-def save_if_stale(cache, note_info, note_paths, settings, pelican_settings):
+def save_if_stale(note_cache, media_cache, note_info, note_paths, settings, pelican_settings):
     unchanged_notes = 0
     note_guid = note_info.metadata.guid
 
-    note = cache[note_guid] if note_guid in cache else None
+    note = note_cache.load(note_guid)
     new_note = None
 
     if note is None or note.updated < note_info.metadata.updated:
         log.info('Retrieving stale or missing note {}'.format(note_guid))
-        note = note_info.store.getNote(note_guid, True, True, True, True)
-        cache[note_guid] = note
+        note = protect_rate_limit(note_info.store.getNote, note_guid, True, False, False, False)
+        note_cache.save(note_guid, note)
         new_note = True
         log.info('Fetched'.format(note.title))
 
@@ -87,7 +79,7 @@ def save_if_stale(cache, note_info, note_paths, settings, pelican_settings):
 
 
 def get_notebooks(note_store):
-    return note_store.listNotebooks()
+    return protect_rate_limit(note_store.listNotebooks)
 
 
 def filter_notebooks(notebooks, notebook_filters):
@@ -108,7 +100,7 @@ def get_note_info(notebook, note_store, token, get_place):
     max_notes = 10
     result_spec = NotesMetadataResultSpec(includeUpdated=True)
     while True:
-        note_results = note_store.findNotesMetadata(token, updated_filter, offset, max_notes, result_spec)
+        note_results = protect_rate_limit(note_store.findNotesMetadata, token, updated_filter, offset, max_notes, result_spec)
         for metadata in note_results.notes:
             yield NoteInfo(
                 metadata=metadata,
@@ -121,18 +113,3 @@ def get_note_info(notebook, note_store, token, get_place):
 
         if offset > note_results.totalNotes:
             break
-
-"""
-int offset = 0;
-int pageSize = 10;
-NotesMetadataList notes = null;
-
-do {
-	notes = noteStore.findNotesMetadata(authToken, filter, offset, pageSize, spec);
-	for (NoteMetadata note : notes.getNotes() {
-	// Do something with the notes we found
-	}
-	offset = offset + notes.getNotesSize();
-} while (notes.getTotalNotes() > offset);
-
-"""

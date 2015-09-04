@@ -4,11 +4,13 @@ from os import path
 from StringIO import StringIO
 import os
 import re
-from .util import slugify, ensure_dir
+from .util import slugify, ensure_dir, protect_rate_limit
 from .image import scale_and_crop, constrain_size
 import datetime
 from pelican.urlwrappers import Tag
 from PIL import Image
+from logging import getLogger
+log = getLogger(__name__)
 
 
 format_timestamp = lambda ms: datetime.datetime.fromtimestamp(ms/1000).strftime('%Y-%m-%d %H:%M')
@@ -22,7 +24,7 @@ MIME_TO_EXTESION_MAPPING = {
 }
 
 
-def save_note(note, note_info, note_paths, pelican_settings):
+def save_note(media_cache, note, note_info, note_paths, pelican_settings):
     notebook_slug = slugify(note_info.notebook.name)
     note_slug = slugify(unicode(note.title))
 
@@ -53,7 +55,7 @@ def save_note(note, note_info, note_paths, pelican_settings):
     html_path = note_paths.html.format(**path_map)
     file_path = note_paths.file.format(**path_map)
 
-    replace_media_tags(soup, note, note_info.store, html_path, file_path, add_meta_tag)
+    replace_media_tags(media_cache, soup, note, note_info.store, html_path, file_path, add_meta_tag)
 
     if note.attributes.latitude is not None and note.attributes.longitude is not None:
         place = note_info.get_place(note.attributes.latitude, note.attributes.longitude)
@@ -91,7 +93,7 @@ def get_summary(soup, summary_length):
     return summary.strip()
 
 
-def replace_media_tags(soup, note, note_store, html_path, file_path, add_meta_tag):
+def replace_media_tags(media_cache, soup, note, note_store, html_path, file_path, add_meta_tag):
     all_media = soup.find_all('en-media')
     if not len(all_media) > 0 and not path.exists(file_path):
         os.makedirs(file_path, mode=0755)
@@ -122,7 +124,7 @@ def replace_media_tags(soup, note, note_store, html_path, file_path, add_meta_ta
             add_meta_tag('hero_image', path.join(html_path, hero_filename))
             add_meta_tag('thumbnail_image', path.join(html_path, thumbnail_filename))
 
-        save_media(resource_hash, note_store, note.guid, outputs)
+        save_media(media_cache, resource_hash, note_store, note.guid, outputs)
 
         anchor = soup.new_tag('a', href=path.join(html_path, full_filename), target='_blank')
         img = soup.new_tag('img', src=path.join(html_path, scaled_filename))
@@ -131,8 +133,19 @@ def replace_media_tags(soup, note, note_store, html_path, file_path, add_meta_ta
         media.replace_with(anchor)
 
 
-def save_media(resource_hash, note_store, note_guid, outputs):
-    data = get_resource_by_hash(note_store, note_guid, resource_hash)
+def save_media(media_cache, resource_hash, note_store, note_guid, outputs):
+    new_outputs = [output for output in outputs if not path.exists(output[0])]
+
+    if len(new_outputs) == 0:
+        return
+
+    log.info('Resource {} has new outputs'.format(resource_hash))
+
+    data = media_cache.load(resource_hash)
+    if not data:
+        data = get_resource_by_hash(note_store, note_guid, resource_hash)
+        log.info('Retrieved resource')
+        media_cache.save(resource_hash, data)
 
     im = Image.open(StringIO(data))
 
@@ -151,9 +164,8 @@ def get_resource_by_hash(note_store, note_guid, resource_guid):
     get resource by its hash
     """
     resource_guid_bin = resource_guid.decode('hex')
-    resource = note_store.getResourceByHash(note_guid, resource_guid_bin, True, False, False)
+    resource = protect_rate_limit(note_store.getResourceByHash, note_guid, resource_guid_bin, True, False, False)
     return resource.data.body
-
 
 tag_re = re.compile('(#\w+)')
 

@@ -3,11 +3,24 @@
     "token-sandbox": "S=s1:U=90cdf:E=1548935fe87:C=14d3184cf68:P=1cd:A=en-devtoken:V=2:H=7369fbadab16c3aee7127e04368ac34f",
     "token": "S=s462:U=4e5f584:E=1560af6a726:C=14eb3457b00:P=1cd:A=en-devtoken:V=2:H=b7b2d9047b8fa6bfc9aa797c030e27a5",
     "sandbox": false,
-    "cache": false,
+    "note cache": {
+        "type": "pickle",
+        "filename": "cache/evernotes.pickle"
+    },
+    "media cache": {
+        "type": "file",
+        "root": "cache/evernote-media"
+    },
     "content path": "content/everdown/{notebook}/{note}",
     "file path": "content/everdown/{notebook}/{note}/files",
     "html path": "/everdown/{notebook}/{note}/files",
-    "google api key": "AIzaSyArgI9GRJImLRiglPntqoMIHAqBcUHTlSA",
+    "location": {
+        "google api key": "AIzaSyArgI9GRJImLRiglPntqoMIHAqBcUHTlSA",
+        "cache": {
+            "type": "pickle",
+            "filename": "cache/location.pickle"
+        }
+    },
     "notebooks": [
       "mo*"
     ],
