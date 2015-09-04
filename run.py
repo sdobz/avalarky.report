@@ -16,7 +16,7 @@ from marshall.everdown import run as everdown_run
 everdown_run(settings['everdown'], pelican_settings)
 
 from pelican import main
-#main()
+main()
 
-#from deploy import s3
-#s3.upload(settings['s3'], settings['pelican']['OUTPUT_PATH'])
+from deploy import s3
+s3.upload(settings['s3'], settings['pelican']['OUTPUT_PATH'])
