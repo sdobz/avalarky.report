@@ -1,11 +1,67 @@
 {% if DEFAULT_PAGINATION %}
+{#
+ * Build a pager with data-page properties
+ * Pager logic (where > is next and >> is last):
+ * [1] 2  3  4  5 ... > >>
+ * < 1  2 [3] 4  5... > >>
+ * << < ... 2  3 [4] 5  6 ... > >>
+ * << < ... 3  4  5  6 [7]
+    $first = "&laquo; first"; // « first
+    $prev = "&lsaquo; prev";  // ‹ prev
+    $last = "last &raquo;";   // next ›
+    $next = "next &rsaquo;";  // last »
+    $gap = "&hellip;";        // …
+#}
+{% if articles_paginator.num_pages <= PAGER_COUNT %}
+  {% set pager_start = 1 %}
+  {% set pager_end = articles_paginator.num_pages %}
+  {% set add_first = false %}
+  {% set add_last = false %}
+{% else %}
+  {% set half_range = ((PAGER_COUNT - 1)/2)|int %}
+  {% set left_mid = 1 + half_range %}
+  {% set right_mid = articles_paginator.num_pages - half_range %}
+  {% if articles_page.number <= left_mid %}
+    {% set pager_start = 1 %}
+    {% set pager_end = PAGER_COUNT %}
+    {% set add_first = false %}
+    {% set add_last = true %}
+  {% elif articles_page.number >= right_mid %}
+    {% set pager_start = articles_paginator.num_pages - PAGER_COUNT + 1 %}
+    {% set pager_end = articles_paginator.num_pages %}
+    {% set add_first = true %}
+    {% set add_last = false %}
+  {% else %}
+    {% set pager_start = articles_page.number - half_range %}
+    {% set pager_end = articles_page.number + half_range %}
+    {% set add_first = true %}
+    {% set add_last = true %}
+  {% endif %}
+{% endif %}
 <p class="paginator">
-    {% if articles_page.has_previous() %}
-        <a href="{{ SITEURL }}/{{ articles_previous_page.url }}">&laquo;</a>
-    {% endif %}
-    Page {{ articles_page.number }} / {{ articles_paginator.num_pages }}
-    {% if articles_page.has_next() %}
-        <a href="{{ SITEURL }}/{{ articles_next_page.url }}">&raquo;</a>
-    {% endif %}
+{% if articles_page.has_previous() %}
+  <a class="prev-button" href="{{ SITEURL }}/{{ articles_previous_page.url }}">prev</a>
+{% else %}
+  <span class="prev-button disabled">prev</span>
+{% endif %}
+{% if add_first %}
+  <span class="page-ellipses">&hellip;</span>
+{% endif %}
+{% for page_number in range(pager_start, pager_end + 1) %}
+  {% if page_number == articles_page.number %}
+    <a class="page-button current" href="{{ SITEURL }}/{{ articles_page.url }}">{{ articles_page.number }}</a>
+  {% else %}
+    {% set page = articles_paginator.page(page_number) %}
+    <a class="page-button" href="{{ SITEURL }}/{{ page.url }}">{{ page_number }}</a>
+  {% endif %}
+{% endfor %}
+{% if add_last %}
+  <span class="page-ellipses">&hellip;</span>
+{% endif %}
+{% if articles_page.has_next() %}
+  <a class="next-button" href="{{ SITEURL }}/{{ articles_next_page.url }}">next</a>
+{% else %}
+  <span class="next-button disabled">prev</span>
+{% endif %}
 </p>
 {% endif %}

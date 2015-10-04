@@ -36,13 +36,13 @@
     {% for article in articles_page.object_list %}
     <li>
       <article class="hentry">
-        <div class="teaser-image">
-          {% if article.thumbnail_image %}
+        {% if article.thumbnail_image %}
+          <div class="teaser-image">
             <a href="{{ SITEURL }}/{{ article.url }}">
               <img src="{{ article.thumbnail_image }}" alt="Thumbnail image for {{ article.title|striptags }}"/>
             </a>
-          {% endif %}
-        </div>
+          </div>
+        {% endif %}
         <div class="teaser-content">
           <header><h2 class="entry-title"><a href="{{ SITEURL }}/{{ article.url }}" rel="bookmark"
                                              title="Permalink to {{ article.title|striptags }}">{{ article.title }}</a>

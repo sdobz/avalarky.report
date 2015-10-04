@@ -1,7 +1,4 @@
-// Variables
-$gray: #a5b2b9;
-$small: 'screen and (max-width: 532px)';
-$medium: 'screen and (min-width: 532px) and (max-width: 832px)';
+@import "variables";
 
 // Global elements
 *,
@@ -43,12 +40,17 @@ img{
 #banner{
   float: left;
   width: 100%;
-  padding: 2rem 0;
+  padding: 1rem 0 1rem 0;
   h1{
     line-height: 1;
     float: left;
     margin: 0;
   }
+  border-image-source: url("#{$image-path}border-box.png");
+  border-image-slice: 8%;
+  border-image-width: 20px;
+  border-image-outset: 16px;
+  border-image-repeat: repeat;
 }
 #menu{
   float: right;
@@ -69,6 +71,7 @@ img{
 #page-title{
   float: left;
   width: 100%;
+  padding-top: 1rem;
 }
 #content {
   width: 600px;

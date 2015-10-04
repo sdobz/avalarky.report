@@ -1,3 +1,4 @@
+@import "variables";
 /* Webicons by Adam Fairhead: http://adamfairhead.com */
 
 .webicon {
@@ -50,7 +51,7 @@
 $webicons-icons: mail facebook twitter instagram linkedin;
 
 // Specify the path to the webicons directory here. Include trailing slash.
-$webicons-url: "/theme/img/" !default;
+$webicons-url: #{$image-path} !default;
 
 @each $webicons-icon in $webicons-icons {
   .no-svg .webicon.#{$webicons-icon} {

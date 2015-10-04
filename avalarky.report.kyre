@@ -57,6 +57,7 @@
     "AUTHOR_FEED_RSS": null,
     "DISPLAY_CATEGORIES_ON_MENU": true,
     "DEFAULT_PAGINATION": 20,
+    "PAGER_COUNT": 10,
     "RELATIVE_URLS": true,
     "OUTPUT_PATH": "www",
     "ARTICLE_URL": "article/{slug}.html",
