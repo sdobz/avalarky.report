@@ -7,6 +7,8 @@ from .util import slugify, protect_rate_limit
 from .parser import save_note
 from .geolocate import create_get_place
 from .store import make_store
+import urllib3.contrib.pyopenssl
+urllib3.contrib.pyopenssl.inject_into_urllib3()
 import logging
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 log = logging.getLogger(__name__)

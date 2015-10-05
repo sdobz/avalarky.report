@@ -59,10 +59,11 @@ def save_note(media_cache, note, note_info, note_paths, pelican_settings):
 
     if note.attributes.latitude is not None and note.attributes.longitude is not None:
         place = note_info.get_place(note.attributes.latitude, note.attributes.longitude)
-        if hasattr(place, 'formatted_address'):
-            add_meta_tag('city', place.formatted_address)
-        elif hasattr(place, 'vicinity'):
-            add_meta_tag('city', place.vicinity)
+        if place:
+            add_meta_tag('city', place)
+        else:
+            add_meta_tag('latitude', note.attributes.latitude)
+            add_meta_tag('longitude', note.attributes.longitude)
 
     tags = linkify_soup(soup, soup.new_tag, pelican_settings)
     add_meta_tag('tags', u', '.join(tags))

@@ -48,7 +48,11 @@
                                              title="Permalink to {{ article.title|striptags }}">{{ article.title }}</a>
           </h2></header>
           <div class="entry-info">
-            <div class="city">{{ article.city }}</div>
+            {% if article.city %}
+              <div class="city">{{ article.city }}</div>
+            {% elif article.latitude and article.longitude %}
+              <div class="coordinates">{{ article.latitude }}, {{ article.longitude }}</div>
+            {% endif %}
             <abbr class="published" title="{{ article.date.isoformat() }}"> {{ article.locale_date }} </abbr>
           </div>
           <div class="entry-content"> {{ article.summary }}</div>
