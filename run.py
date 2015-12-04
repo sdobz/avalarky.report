@@ -9,6 +9,9 @@ import json
 with open('avalarky.report.kyre') as f:
     settings = json.load(f)
 
+with open('avalarky.report.secret.kyre') as f:
+    settings.update(json.load(f))
+
 from marshall.pelican.horrible_monkey_patch import patch_pelican_settings
 pelican_settings = patch_pelican_settings(settings['pelican'])
 

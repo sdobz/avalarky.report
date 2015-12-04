@@ -1,7 +1,7 @@
 {
   "everdown": {
-    "token-sandbox": "S=s1:U=90cdf:E=1548935fe87:C=14d3184cf68:P=1cd:A=en-devtoken:V=2:H=7369fbadab16c3aee7127e04368ac34f",
-    "token": "S=s462:U=4e5f584:E=1560af6a726:C=14eb3457b00:P=1cd:A=en-devtoken:V=2:H=b7b2d9047b8fa6bfc9aa797c030e27a5",
+    "token-sandbox": "secret",
+    "token": "secret",
     "sandbox": false,
     "note cache": {
         "type": "pickle",
@@ -15,7 +15,7 @@
     "file path": "content/everdown/{notebook}/{note}/files",
     "html path": "/everdown/{notebook}/{note}/files",
     "location": {
-        "google api key": "AIzaSyArgI9GRJImLRiglPntqoMIHAqBcUHTlSA",
+        "google api key": "secret",
         "cache": {
             "type": "pickle",
             "filename": "cache/location.pickle"
@@ -66,7 +66,7 @@
   },
   "s3": {
     "bucket": "avalarky.report",
-    "access-key-id": "AKIAJCGX4Y5MSGQYBMOA",
-    "secret-access-key": "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"
+    "access-key-id": "secret",
+    "secret-access-key": "secret"
   }
 }

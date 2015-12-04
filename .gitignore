@@ -1,5 +1,5 @@
 .idea
-secret
+*.secret.kyre
 *.pyc
 env
 cache
