@@ -4,13 +4,8 @@ import os
 import sys
 sys.path.append(os.path.dirname(__file__))
 
-import json
-
-with open('avalarky.report.kyre') as f:
-    settings = json.load(f)
-
-with open('avalarky.report.secret.kyre') as f:
-    settings.update(json.load(f))
+from kyre.settings import load_settings
+settings = load_settings(['avalarky.report.kyre', 'avalarky.report.secret.kyre'])
 
 from marshall.pelican.horrible_monkey_patch import patch_pelican_settings
 pelican_settings = patch_pelican_settings(settings['pelican'])
