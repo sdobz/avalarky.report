@@ -24,7 +24,7 @@ MIME_TO_EXTESION_MAPPING = {
 }
 
 
-def save_note(media_cache, note, note_info, note_paths, pelican_settings):
+def save_note(media_cache, note, note_info, note_paths):
     notebook_slug = slugify(note_info.notebook.name)
     note_slug = slugify(unicode(note.title))
 
@@ -65,7 +65,7 @@ def save_note(media_cache, note, note_info, note_paths, pelican_settings):
             add_meta_tag('latitude', note.attributes.latitude)
             add_meta_tag('longitude', note.attributes.longitude)
 
-    tags = linkify_soup(soup, soup.new_tag, pelican_settings)
+    tags = linkify_soup(soup, soup.new_tag)
     add_meta_tag('tags', u', '.join(tags))
 
     summary = get_summary(note_soup, 120)
@@ -171,13 +171,13 @@ def get_resource_by_hash(note_store, note_guid, resource_guid):
 tag_re = re.compile('(#\w+)')
 
 
-def linkify_soup(soup, new_tag, pelican_settings):
+def linkify_soup(soup, new_tag):
     assert hasattr(soup, 'contents')
     tags = set()
     old_elements = [e for e in soup.contents]
     for element in old_elements:
         if not isinstance(element, NavigableString):
-            tags = tags.union(linkify_soup(element, new_tag, pelican_settings))
+            tags = tags.union(linkify_soup(element, new_tag))
             continue
 
         segments = tag_re.split(element)
@@ -192,9 +192,7 @@ def linkify_soup(soup, new_tag, pelican_settings):
                 if tag_re.match(segment) is None:
                     new_e = NavigableString(segment)
                 else:
-                    tag = Tag(segment, pelican_settings)
-                    # This is how pelican does tag urls...
-                    new_e = new_tag("a", href=pelican_settings['SITEURL'] + '/' + tag.url)
+                    new_e = new_tag("a", href='tag/{}.html'.format(segment))
                     new_e.string = segment
                     tags.add(segment[1:])
                 insertion_target.insert_after(new_e)

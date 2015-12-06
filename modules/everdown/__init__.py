@@ -10,14 +10,13 @@ from .store import make_store
 import urllib3.contrib.pyopenssl
 urllib3.contrib.pyopenssl.inject_into_urllib3()
 import logging
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 log = logging.getLogger(__name__)
 
 NoteInfo = namedtuple('NoteInfo', 'metadata notebook store token get_place')
 NotePaths = namedtuple('NotePaths', 'content html file')
 
 
-def run(settings, pelican_settings):
+def run(settings):
     log.info('Starting run')
 
     if settings['sandbox']:
@@ -49,13 +48,13 @@ def run(settings, pelican_settings):
         unchanged_notes = 0
 
         for note_info in get_note_info(notebook, note_store, token, get_place):
-            unchanged_notes += save_if_stale(note_cache, media_cache, note_info, note_paths, settings, pelican_settings)
+            unchanged_notes += save_if_stale(note_cache, media_cache, note_info, note_paths, settings)
 
         if unchanged_notes > 0:
             log.info('Skipped {} unchanged notes'.format(unchanged_notes))
 
 
-def save_if_stale(note_cache, media_cache, note_info, note_paths, settings, pelican_settings):
+def save_if_stale(note_cache, media_cache, note_info, note_paths, settings):
     unchanged_notes = 0
     note_guid = note_info.metadata.guid
 
@@ -71,7 +70,7 @@ def save_if_stale(note_cache, media_cache, note_info, note_paths, settings, peli
 
     if settings['rebuild notes'] or new_note:
         try:
-            save_note(media_cache, note, note_info, note_paths, pelican_settings)
+            save_note(media_cache, note, note_info, note_paths)
         except BaseException as e:
             log.error('Caught exception: {}'.format(e))
         log.info('Wrote note: {}'.format(note.title))

@@ -25,10 +25,11 @@ def file_hash(f):
     return hashlib.md5(open(f, 'rb').read()).hexdigest()
 
 
-def upload(settings, source):
+def run(settings):
     monkey_patch_ssl()
     s3 = S3Connection(settings['access-key-id'], settings['secret-access-key'])
     bucket = s3.get_bucket(settings['bucket'])
+    source = settings['source']
     for path, dir, files in os.walk(source):
         for file in files:
             relpath = os.path.relpath(os.path.join(path, file))

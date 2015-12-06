@@ -13,7 +13,7 @@ if [ ! -f ./.env/bin/python ]; then
 fi
 
 
-./.env/bin/pip install -r kyre/requirements.pip
+./.env/bin/pip install -r requirements.pip
 if [ ! $? -eq 0 ]; then
     echo "pip installation failed, exiting"
     exit 1
