@@ -14,8 +14,8 @@ Usage (to create a clone of avalarky.report)
   * Evernote Developer token [goto page](https://www.evernote.com/api/DeveloperToken.action)
   * Google Maps API server key with geocode permissions [documentation](https://developers.google.com/maps/documentation/geocoding/get-api-key) or [signup flow](https://console.developers.google.com/flows/enableapi?apiid=geocoding_backend&keyType=SERVER_SIDE&reusekey=true)
   * Amazon AWS credentials for S3 [iam console](https://console.aws.amazon.com/iam/home?#users)
-* Create python environment `cd marshall && virtualenv env && ./env/bin/pip install -r requirements.pip`
-* Run program `./run.py`
+* Create python environment `./bootstrap.sh`
+* Run program `./kyre.py`
 
 # Overview
 
