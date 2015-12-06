@@ -38,7 +38,7 @@
     ],
     "DISQUS_SHORTNAME": "avalarkyreport",
     "GOOGLE_ANALYTICS": "UA-65403321-1",
-    "THEME": "marshall/pelican/themes/avalarky_report/",
+    "THEME": "content/themes/avalarky_report/",
     "CSS_FILE": "theme.css",
     "PATH": "content",
     "STATIC_PATHS": ["extra/favicon.ico", "everdown"],

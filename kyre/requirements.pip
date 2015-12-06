@@ -29,3 +29,5 @@ requests==2.7.0
 six==1.9.0
 urllib3==1.12
 wsgiref==0.1.2
+
+# TODO: move requirements into requirements.pip per plugin?

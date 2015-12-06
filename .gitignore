@@ -1,8 +1,8 @@
 .idea
 *.secret.kyre
 *.pyc
-env
+.env
 cache
 www
-marshall/pelican/themes/avalarky_report/gulp/node_modules
+node_modules
 content/everdown
