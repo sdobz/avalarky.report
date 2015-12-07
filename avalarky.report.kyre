@@ -1,5 +1,5 @@
 {
-  "lets do this": [
+  "run these in order": [
     {
       "!everdown.download_notes": {
         "token-sandbox": "{{secret.everdown.token-sandbox}}",
