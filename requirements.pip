@@ -27,7 +27,8 @@ python-google-places==1.0.0
 pytz==2015.4
 requests==2.7.0
 six==1.9.0
+toml==0.9.1
 urllib3==1.12
 wsgiref==0.1.2
 
-# TODO: move requirements into requirements.pip per plugin?
+# TODO: move requirements into __init__.py per module

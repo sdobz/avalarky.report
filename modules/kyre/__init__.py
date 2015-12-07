@@ -3,7 +3,7 @@
 import os
 import collections
 from os import path
-import json
+import toml
 import importlib
 import re
 import shlex
@@ -43,13 +43,32 @@ def load_settings(settings_files):
     :return: Kyre is run on the combination of all files
     :rtype dict:
     """
-    settings = {}
+    combined_settings = {}
     for filename in settings_files:
         if path.exists(filename):
             with open(filename, 'r') as f:
-                combine_settings(settings, json.load(f))
+                processed_setting_string = preprocess_setting_string(f.read())
+                combine_settings(combined_settings, toml.loads(processed_setting_string))
 
-    return settings
+    return combined_settings
+
+
+def preprocess_setting_string(setting_string):
+    """
+    Some kyre sugar allows references to be defined like:
+    key = {{reference}}
+    where toml requires strings:
+    key = "{{reference}}"
+    this performs that replacement
+    :param setting_string:
+    :return:
+    """
+    # This pattern matches:
+    # <anything>=<whitespace>{{<anything>}}<anything>
+    # And replaces it with
+    # <anything>=<whitespace>"{{<anything>}}"<anything>
+    reference_value_pattern = r'(.*?=\s*)({prefix}.*{suffix})(.*)'.format(prefix=REFERENCE_PREFIX, suffix=REFERENCE_SUFFIX)
+    return re.sub(reference_value_pattern, r'\1"\2"\3', setting_string)
 
 
 def combine_settings(d, u):

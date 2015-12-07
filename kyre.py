@@ -1,3 +1,5 @@
+#!.env/bin/python
+
 import sys
 from modules.kyre import setup, load_settings, dereference_settings, execute
 

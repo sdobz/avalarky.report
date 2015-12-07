@@ -1,102 +1,66 @@
-{
-  "run these in order": [
-    {
-      "!everdown.download_notes": {
-        "token-sandbox": "{{secret.everdown.token-sandbox}}",
-        "token": "{{secret.everdown.token}}",
-        "sandbox": false,
-        "note cache": {
-          "type": "pickle",
-          "filename": "cache/evernotes.pickle"
-        },
-        "media cache": {
-          "type": "file",
-          "root": "cache/evernote-media"
-        },
-        "content path": "content/everdown/{notebook}/{note}",
-        "file path": "content/everdown/{notebook}/{note}/files",
-        "html path": "/everdown/{notebook}/{note}/files",
-        "location": {
-          "google api key": "{{secret.everdown.'google api key'}}",
-          "cache": {
-            "type": "pickle",
-            "filename": "cache/location.pickle"
-          }
-        },
-        "notebooks": [
-          "mo*"
-        ],
-        "rebuild notes": false
-      }
-    },
-    {
-      "!pelican.run": {
-        "AUTHOR": "Vincent Khougaz",
-        "SITENAME": "avalarky.report",
-        "SITEURL": "http://avalarky.report",
-        "SOCIAL": [
-          [
-            "mail",
-            "mailto:vincent@khougaz.com"
-          ],
-          [
-            "facebook",
-            "https://facebook.com/vincent.khougaz"
-          ],
-          [
-            "twitter",
-            "https://twitter.com/sdobz"
-          ],
-          [
-            "linkedin",
-            "https://www.linkedin.com/pub/vincent-khougaz/53/915/71b"
-          ]
-        ],
-        "DISQUS_SHORTNAME": "avalarkyreport",
-        "GOOGLE_ANALYTICS": "UA-65403321-1",
-        "THEME": "resources/themes/avalarky_report/",
-        "CSS_FILE": "theme.css",
-        "PATH": "content",
-        "STATIC_PATHS": [
-          "extra/favicon.ico",
-          "everdown"
-        ],
-        "EXTRA_PATH_METADATA": {
-          "extra/favicon.ico": {
-            "path": "favicon.ico"
-          }
-        },
-        "CACHE_PATH": "cache/pelican",
-        "TIMEZONE": "America/Los_Angeles",
-        "DEFAULT_LANG": "en",
-        "FEED_ALL_ATOM": null,
-        "CATEGORY_FEED_ATOM": null,
-        "TRANSLATION_FEED_ATOM": null,
-        "AUTHOR_FEED_ATOM": null,
-        "AUTHOR_FEED_RSS": null,
-        "DISPLAY_CATEGORIES_ON_MENU": true,
-        "DEFAULT_PAGINATION": 20,
-        "PAGER_COUNT": 10,
-        "RELATIVE_URLS": true,
-        "OUTPUT_PATH": "{{shared.'www path'}}",
-        "ARTICLE_URL": "article/{slug}.html",
-        "ARTICLE_SAVE_AS": "article/{slug}.html",
-        "DELETE_OUTPUT_DIRECTORY": true
-      }
-    },
-    {
-      "!s3.upload": {
-        "source": "{{shared.'www path'}}",
-        "bucket": "avalarky.report",
-        "access-key-id": "{{secret.s3.access-key-id}}",
-        "secret-access-key": "{{secret.s3.secret-access-key}}"
-      }
-    }
-  ],
-  "shared": {
-    "www path": "www"
-  },
-  "secret": {
-    "comment": "These values are included by avalarky.report.secret.kyre"
-  }
-}
+[[run]]
+"!everdown.download_notes" = {{everdown-config}}
+[[run]]
+"!pelican.run" = {{pelican-config}}
+[[run]]
+"!s3.upload" = {{s3-config}}
+
+[shared]
+www-path = "www"
+
+[s3-config]
+secret-access-key = {{secret.s3.secret-access-key}}
+source = {{shared.www-path}}
+bucket = "avalarky.report"
+access-key-id = {{secret.s3.access-key-id}}
+
+[everdown-config]
+    token = {{secret.everdown.token}}
+    token-sandbox = {{secret.everdown.token-sandbox}}
+    notebooks = [ "mo*",]
+    sandbox = false
+    rebuild-notes = false
+    file-path = "content/everdown/{notebook}/{note}/files"
+    content-path = "content/everdown/{notebook}/{note}"
+    html-path = "/everdown/{notebook}/{note}/files"
+    [everdown-config.media-cache]
+        root = "cache/evernote-media"
+        type = "file"
+    [everdown-config.note-cache]
+        type = "pickle"
+        filename = "cache/evernotes.pickle"
+    [everdown-config.location]
+        google-api-key = {{secret.everdown.google-api-key}}
+        [everdown-config.location.cache]
+            type = "pickle"
+            filename = "cache/location.pickle"
+
+[pelican-config]
+    DELETE_OUTPUT_DIRECTORY = true
+    PATH = "content"
+    TIMEZONE = "America/Los_Angeles"
+    DISQUS_SHORTNAME = "avalarkyreport"
+    DEFAULT_LANG = "en"
+    AUTHOR = "Vincent Khougaz"
+    SITENAME = "avalarky.report"
+    PAGER_COUNT = 10
+    DISPLAY_CATEGORIES_ON_MENU = true
+    ARTICLE_URL = "article/{slug}.html"
+    ARTICLE_SAVE_AS = "article/{slug}.html"
+    DEFAULT_PAGINATION = 20
+    RELATIVE_URLS = true
+    STATIC_PATHS = [ "extra/favicon.ico", "everdown",]
+    CSS_FILE = "theme.css"
+    GOOGLE_ANALYTICS = "UA-65403321-1"
+    SITEURL = "http://avalarky.report"
+    THEME = "resources/themes/avalarky_report/"
+    CACHE_PATH = "cache/pelican"
+    OUTPUT_PATH = {{shared.www-path}}
+    SOCIAL = [
+        ["mail", "mailto:vincent@khougaz.com"],
+        ["facebook", "https://facebook.com/vincent.khougaz"],
+        ["twitter", "https://twitter.com/sdobz"],
+        ["linkedin", "https://www.linkedin.com/pub/vincent-khougaz/53/915/71b"]
+    ]
+    [pelican-config.EXTRA_PATH_METADATA."extra/favicon.ico"]
+        path = "favicon.ico"

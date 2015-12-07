@@ -26,12 +26,12 @@ def download_notes(**settings):
         token = settings['token']
         sandbox = False
 
-    note_cache = make_store(settings['note cache'])
-    media_cache = make_store(settings['media cache'])
+    note_cache = make_store(settings['note-cache'])
+    media_cache = make_store(settings['media-cache'])
     note_paths = NotePaths(
-        content=settings['content path'],
-        file=settings['file path'],
-        html=settings['html path']
+        content=settings['content-path'],
+        file=settings['file-path'],
+        html=settings['html-path']
     )
     get_place = create_get_place(settings['location'])
 
@@ -68,7 +68,7 @@ def save_if_stale(note_cache, media_cache, note_info, note_paths, settings):
         new_note = True
         log.info('Fetched'.format(note.title))
 
-    if settings['rebuild notes'] or new_note:
+    if settings['rebuild-notes'] or new_note:
         try:
             save_note(media_cache, note, note_info, note_paths)
         except BaseException as e:

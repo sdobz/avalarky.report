@@ -19,7 +19,7 @@ def create_get_place(settings):
             lat=lat,
             lon=lon,
             type='administrative_area_level_1|administrative_area_level_2|administrative_area_level_3|point_of_interest|natural_feature|locality',
-            key=settings['google api key']
+            key=settings['google-api-key']
         ))
         if response.ok:
             place = response.json()['results'][0]['formatted_address']
