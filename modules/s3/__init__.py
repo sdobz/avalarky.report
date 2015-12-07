@@ -25,7 +25,7 @@ def file_hash(f):
     return hashlib.md5(open(f, 'rb').read()).hexdigest()
 
 
-def run(settings):
+def upload(**settings):
     monkey_patch_ssl()
     s3 = S3Connection(settings['access-key-id'], settings['secret-access-key'])
     bucket = s3.get_bucket(settings['bucket'])

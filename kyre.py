@@ -14,6 +14,12 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 log = logging.getLogger(__name__)
 
 
+EXECUTION_PREFIX = '!'
+REFERENCE_PREFIX = '{{'
+REFERENCE_SUFFIX = '}}'
+EXECUTION_DIRECTORY = 'modules'
+
+
 def load_settings(settings_files):
     """
     Settings are specified as a list of json files
@@ -77,18 +83,20 @@ def dereference_settings(full_tree, partial_tree=None):
     if partial_tree is None:
         partial_tree = full_tree
     # Look for keys that match "{{anything}}"
-    replacement_pattern = re.compile("^{{(.*)}}$")
-    insertion_pattern = re.compile("{{(.*)}}")
+    reference_pattern = '{prefix}(.*){suffix}'.format(prefix=REFERENCE_PREFIX, suffix=REFERENCE_SUFFIX)
+    insertion_regex = re.compile(reference_pattern)
+    # This only matches if the entire string is a reference pattern
+    replacement_regex = re.compile('^' + reference_pattern + '$')
     for key, value in partial_tree.iteritems():
         if isinstance(value, basestring):
             # If the replacement pattern is found with no leading or trailing characters lookup and replace the value
-            replace = replacement_pattern.match(value)
+            replace = replacement_regex.match(value)
             if replace is not None:
                 # If replace matches then replace the result with the looked up value
-                partial_tree[key] = lookup_match(replace, full_tree, key, value)
+                partial_tree[key] = lookup_reference(replace, full_tree, key, value)
             else:
                 # If replace doesn't match attempt to replace occurrences in a larger string
-                insertion_pattern.sub(lambda match: lookup_match(match, full_tree, key, value, force_string=True), value)
+                insertion_regex.sub(lambda match: lookup_reference(match, full_tree, key, value, force_string=True), value)
 
         elif isinstance(value, collections.Mapping):
             # If the value is a mapping/dict then recurse and check it too
@@ -101,7 +109,7 @@ def dereference_settings(full_tree, partial_tree=None):
             dereference_settings(full_tree, dict(enumerate(value)))
 
 
-def lookup_match(match, full_tree, key, value, force_string=False):
+def lookup_reference(match, full_tree, key, value, force_string=False):
     """
     Matches can either be replacements or insertions.
     If the whole value is a reference then it will be replaced, such as including an entire settings tree
@@ -139,14 +147,47 @@ def lookup_match(match, full_tree, key, value, force_string=False):
         return value
 
 
+def execute(settings):
+    for key, value in settings.iteritems():
+        # If the _key_ is an execution then run the referenced function and stop
+        if isinstance(key, basestring) and key.startswith(EXECUTION_PREFIX):
+            # Execution string is the key with the prefix stripped
+            execution_string = key[len(EXECUTION_PREFIX):]
+            execution_parts = execution_string.split('.')
+
+            if len(execution_parts) <= 1:
+                log.warning("Key: {} has execution prefix but is not a valid module+function")
+                continue
+
+            # Module is everything before the last . prefixed by the module directory
+            module_str = '.'.join([EXECUTION_DIRECTORY] + execution_parts[:-1])
+            # Func is everything after the last .
+            func_str = execution_parts[-1]
+
+            module = importlib.import_module(module_str)
+            assert module
+            assert hasattr(module, func_str)
+            func = getattr(module, func_str)
+
+            if isinstance(value, dict):
+                func(**value)
+            elif isinstance(value, list):
+                func(*value)
+            else:
+                func(value)
+
+        # If the _value_ is a dict (and the key is not an execution) try to execute its keys
+        elif isinstance(value, dict):
+            execute(value)
+
+        # If the _value_ is a list (and the key is not an execution)
+        # search through the items and if it is a dict try to execute its keys
+        elif isinstance(value, list):
+            for item in value:
+                if isinstance(item, dict):
+                    execute(item)
+
 if __name__ == '__main__':
     settings = load_settings(['avalarky.report.kyre', 'avalarky.report.secret.kyre'])
     dereference_settings(settings)
-
-    assert 'sequence' in settings
-    for item in settings['sequence']:
-        assert 'module' in item
-        assert 'settings' in item
-        module = importlib.import_module(item['module'])
-        assert 'run' in module.__dict__
-        module.run(item['settings'])
+    execute(settings)

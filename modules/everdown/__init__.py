@@ -16,7 +16,7 @@ NoteInfo = namedtuple('NoteInfo', 'metadata notebook store token get_place')
 NotePaths = namedtuple('NotePaths', 'content html file')
 
 
-def run(settings):
+def download_notes(**settings):
     log.info('Starting run')
 
     if settings['sandbox']:

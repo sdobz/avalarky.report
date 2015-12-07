@@ -1,8 +1,7 @@
 {
-  "sequence": [
+  "lets do this": [
     {
-      "module": "modules.everdown",
-      "settings": {
+      "!everdown.download_notes": {
         "token-sandbox": "{{secret.everdown.token-sandbox}}",
         "token": "{{secret.everdown.token}}",
         "sandbox": false,
@@ -31,8 +30,7 @@
       }
     },
     {
-      "module": "modules.pelican",
-      "settings": {
+      "!pelican.run": {
         "AUTHOR": "Vincent Khougaz",
         "SITENAME": "avalarky.report",
         "SITEURL": "http://avalarky.report",
@@ -87,8 +85,7 @@
       }
     },
     {
-      "module": "modules.s3",
-      "settings": {
+      "!s3.upload": {
         "source": "{{shared.'www path'}}",
         "bucket": "avalarky.report",
         "access-key-id": "{{secret.s3.access-key-id}}",
