@@ -1,4 +1,5 @@
-[[run]]
+[[do]]
+"!command.add"
 "!everdown.download_notes" = {{everdown-config}}
 [[run]]
 "!pelican.run" = {{pelican-config}}
