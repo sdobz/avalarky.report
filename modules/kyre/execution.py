@@ -39,8 +39,44 @@ def discover_modules():
             if file == '__init__.py':
                 module_import_string = root.replace(os.sep, '.')
                 log.info("Discovered module {} -> {}".format(module_name, module_import_string))
-                import_paths[module_name] = module_import_string
+                import_paths[EXECUTION_PREFIX + module_name] = module_import_string
     return import_paths
+
+
+def execute(settings):
+    if hasattr(settings, '__iter__'):
+        if not hasattr(settings, 'iteritems'):
+            for item in settings:
+                execute(item)
+        else:
+            iteritems = settings.iteritems()
+            assert hasattr(iteritems, '__call__')
+            for key, value in settings.iteritems():
+                if not execute_key_if_func(key, value)
+
+
+def execute_key_if_func(key, value):
+    # If the _key_ is an execution then run the referenced function and stop
+    if not isinstance(key, basestring) or not key.startswith(EXECUTION_PREFIX):
+        return False
+
+    try:
+        module_str, func_str = key.split('.')
+    except ValueError:
+        # It couldn't unpack it, so didn't have exactly one .
+        return False
+
+    module = get_module(module_str)
+    if not module:
+        return False
+
+    func = get_function(module_str, func_str)
+    if not func:
+        return False
+
+    call_func_with_arguments(func, value)
+
+    return True
 
 
 def get_module(name):
@@ -48,8 +84,6 @@ def get_module(name):
         return module_cache[name]
 
     if name not in discovered_modules:
-        # TODO: offer to download?
-        log.error("Module: {} not discovered".format(name))
         return None
 
     try:
@@ -62,49 +96,23 @@ def get_module(name):
     return module
 
 
-def get_function(module_name, func_name):
-    module = get_module(module_name)
+def get_function(module_str, func_str):
+    module = get_module(module_str)
 
-    if not hasattr(module, func_name) or not hasattr(getattr(module, func_name), '__call__'):
-        log.error("Module: {} does not have function: {}".format(module_name, func_name))
+    if not module:
         return None
 
-    return getattr(module, func_name)
+    if not hasattr(module, func_str) or not hasattr(getattr(module, func_str), '__call__'):
+        log.error("Module: {} does not have function: {}".format(module_str, func_str))
+        return None
+
+    return getattr(module, func_str)
 
 
-def execute(settings):
-    for key, value in settings.iteritems():
-        # If the _key_ is an execution then run the referenced function and stop
-        if isinstance(key, basestring) and key.startswith(EXECUTION_PREFIX):
-            # Execution string is the key with the prefix stripped
-            execution_string = key[len(EXECUTION_PREFIX):]
-            execution_parts = execution_string.split('.')
-
-            if len(execution_parts) <= 1:
-                log.warning("Key: {} has execution prefix but is not a valid module+function")
-                continue
-
-            # Module is everything before the last . prefixed by the module directory
-            module_str = '.'.join([EXECUTION_DIRECTORY] + execution_parts[:-1])
-            # Func is everything after the last .
-            func_str = execution_parts[-1]
-
-            func = get_function(module_str, func_str)
-
-            if isinstance(value, dict):
-                func(**value)
-            elif isinstance(value, list):
-                func(*value)
-            else:
-                func(value)
-
-        # If the _value_ is a dict (and the key is not an execution) try to execute its keys
-        elif isinstance(value, dict):
-            execute(value)
-
-        # If the _value_ is a list (and the key is not an execution)
-        # search through the items and if it is a dict try to execute its keys
-        elif isinstance(value, list):
-            for item in value:
-                if isinstance(item, dict):
-                    execute(item)
+def call_func_with_arguments(func, value):
+    if isinstance(value, dict):
+        func(**value)
+    elif isinstance(value, list):
+        func(*value)
+    else:
+        func(value)

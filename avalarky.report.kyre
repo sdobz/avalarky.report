@@ -1,67 +1,64 @@
-[[do]]
-"!command.add"
-"!everdown.download_notes" = {{everdown-config}}
-[[run]]
-"!pelican.run" = {{pelican-config}}
-[[run]]
-"!s3.upload" = {{s3-config}}
+shared:
+  www-path: &www-path www
 
-[shared]
-www-path = "www"
-
-[s3-config]
-secret-access-key = {{secret.s3.secret-access-key}}
-source = {{shared.www-path}}
-bucket = "avalarky.report"
-access-key-id = {{secret.s3.access-key-id}}
-
-[everdown-config]
-    token = {{secret.everdown.token}}
-    token-sandbox = {{secret.everdown.token-sandbox}}
-    notebooks = [ "mo*",]
-    sandbox = false
-    rebuild-notes = false
-    file-path = "content/everdown/{notebook}/{note}/files"
-    content-path = "content/everdown/{notebook}/{note}"
-    html-path = "/everdown/{notebook}/{note}/files"
-    [everdown-config.media-cache]
-        root = "cache/evernote-media"
-        type = "file"
-    [everdown-config.note-cache]
-        type = "pickle"
-        filename = "cache/evernotes.pickle"
-    [everdown-config.location]
-        google-api-key = {{secret.everdown.google-api-key}}
-        [everdown-config.location.cache]
-            type = "pickle"
-            filename = "cache/location.pickle"
-
-[pelican-config]
-    DELETE_OUTPUT_DIRECTORY = true
-    PATH = "content"
-    TIMEZONE = "America/Los_Angeles"
-    DISQUS_SHORTNAME = "avalarkyreport"
-    DEFAULT_LANG = "en"
-    AUTHOR = "Vincent Khougaz"
-    SITENAME = "avalarky.report"
-    PAGER_COUNT = 10
-    DISPLAY_CATEGORIES_ON_MENU = true
-    ARTICLE_URL = "article/{slug}.html"
-    ARTICLE_SAVE_AS = "article/{slug}.html"
-    DEFAULT_PAGINATION = 20
-    RELATIVE_URLS = true
-    STATIC_PATHS = [ "extra/favicon.ico", "everdown",]
-    CSS_FILE = "theme.css"
-    GOOGLE_ANALYTICS = "UA-65403321-1"
-    SITEURL = "http://avalarky.report"
-    THEME = "resources/themes/avalarky_report/"
-    CACHE_PATH = "cache/pelican"
-    OUTPUT_PATH = {{shared.www-path}}
-    SOCIAL = [
-        ["mail", "mailto:vincent@khougaz.com"],
-        ["facebook", "https://facebook.com/vincent.khougaz"],
-        ["twitter", "https://twitter.com/sdobz"],
-        ["linkedin", "https://www.linkedin.com/pub/vincent-khougaz/53/915/71b"]
-    ]
-    [pelican-config.EXTRA_PATH_METADATA."extra/favicon.ico"]
-        path = "favicon.ico"
+avalarky.report:
+- ~command.add:
+    name: evernote
+    run:
+      ~everdown.download_notes:
+        <<: *secret_everdown
+        content-path: content/everdown/{notebook}/{note}
+        file-path: content/everdown/{notebook}/{note}/files
+        html-path: /everdown/{notebook}/{note}/files
+        location:
+          cache: {filename: cache/location.pickle, type: pickle}
+        media-cache: {root: cache/evernote-media, type: file}
+        note-cache: {filename: cache/evernotes.pickle, type: pickle}
+        notebooks: [mo*]
+        rebuild-notes: false
+        sandbox: false
+- ~command.add:
+    name: pelican
+    run:
+      ~pelican.run:
+        ARTICLE_SAVE_AS: article/{slug}.html
+        ARTICLE_URL: article/{slug}.html
+        AUTHOR: Vincent Khougaz
+        CACHE_PATH: cache/pelican
+        CSS_FILE: theme.css
+        DEFAULT_LANG: en
+        DEFAULT_PAGINATION: 20
+        DELETE_OUTPUT_DIRECTORY: true
+        DISPLAY_CATEGORIES_ON_MENU: true
+        DISQUS_SHORTNAME: avalarkyreport
+        EXTRA_PATH_METADATA:
+          extra/favicon.ico: {path: favicon.ico}
+        GOOGLE_ANALYTICS: UA-65403321-1
+        OUTPUT_PATH: *www-path
+        PAGER_COUNT: 10
+        PATH: content
+        RELATIVE_URLS: true
+        SITENAME: avalarky.report
+        SITEURL: http://avalarky.report
+        SOCIAL:
+        - [mail, 'mailto:vincent@khougaz.com']
+        - [facebook, 'https://facebook.com/vincent.khougaz']
+        - [twitter, 'https://twitter.com/sdobz']
+        - [linkedin, 'https://www.linkedin.com/pub/vincent-khougaz/53/915/71b']
+        STATIC_PATHS: [extra/favicon.ico, everdown]
+        THEME: resources/themes/avalarky_report/
+        TIMEZONE: America/Los_Angeles
+- ~command.add:
+    name: s3
+    run:
+      ~s3.upload:
+        <<: *secret_s3
+        bucket: avalarky.report
+        source: *www-path
+- ~command.add:
+    name: all
+    run:
+      ~command.run:
+        - evernote
+        - pelican
+        - s3
