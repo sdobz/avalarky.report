@@ -5,26 +5,20 @@ log = getLogger(__name__)
 
 # Is this the right way to do this??
 # Default values:
-EXECUTION_PREFIX = '!'
-REFERENCE_PREFIX = '{{'
-REFERENCE_SUFFIX = '}}'
+EXECUTION_PREFIX = '~'
 EXECUTION_DIRECTORY = 'modules'
 
 module_cache = {}
 discovered_modules = {}
 
 
-def setup(execution_prefix=EXECUTION_PREFIX,
-          reference_prefix=REFERENCE_PREFIX,
-          reference_suffix=REFERENCE_SUFFIX,
-          execution_directory=EXECUTION_DIRECTORY):
+def setup_execution(prefix=EXECUTION_PREFIX,
+                    directory=EXECUTION_DIRECTORY):
 
     # Update the values
-    global EXECUTION_PREFIX, REFERENCE_PREFIX, REFERENCE_SUFFIX, EXECUTION_DIRECTORY
-    EXECUTION_PREFIX = execution_prefix
-    REFERENCE_PREFIX = reference_prefix
-    REFERENCE_SUFFIX = reference_suffix
-    EXECUTION_DIRECTORY = execution_directory
+    global EXECUTION_PREFIX, EXECUTION_DIRECTORY
+    EXECUTION_PREFIX = prefix
+    EXECUTION_DIRECTORY = directory
 
     global discovered_modules
     discovered_modules = discover_modules()
@@ -44,15 +38,13 @@ def discover_modules():
 
 
 def execute(settings):
-    if hasattr(settings, '__iter__'):
-        if not hasattr(settings, 'iteritems'):
-            for item in settings:
-                execute(item)
-        else:
-            iteritems = settings.iteritems()
-            assert hasattr(iteritems, '__call__')
-            for key, value in settings.iteritems():
-                if not execute_key_if_func(key, value)
+    if hasattr(settings, 'iteritems'):
+        for key, value in settings.iteritems():
+            if not execute_key_if_func(key, value):
+                execute(value)
+    elif hasattr(settings, '__iter__'):
+        for item in settings:
+            execute(item)
 
 
 def execute_key_if_func(key, value):
@@ -110,9 +102,9 @@ def get_function(module_str, func_str):
 
 
 def call_func_with_arguments(func, value):
-    if isinstance(value, dict):
+    if hasattr(value, 'iteritems'):
         func(**value)
-    elif isinstance(value, list):
+    elif hasattr(value, '__iter__'):
         func(*value)
     else:
         func(value)
