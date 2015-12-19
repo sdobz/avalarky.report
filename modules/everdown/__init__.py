@@ -7,6 +7,9 @@ from .util import slugify, protect_rate_limit
 from .parser import save_note
 from .geolocate import create_get_place
 from .store import make_store
+from .everfetch import Everfetch
+from .note import Note, update_notes
+from ..kyre.dependency import inject
 import urllib3.contrib.pyopenssl
 urllib3.contrib.pyopenssl.inject_into_urllib3()
 import logging
@@ -14,6 +17,23 @@ log = logging.getLogger(__name__)
 
 NoteInfo = namedtuple('NoteInfo', 'metadata notebook store token get_place')
 NotePaths = namedtuple('NotePaths', 'content html file')
+
+
+MEDIA_KEY = '{}-media'
+
+
+@inject('store')
+def download_notes2(store, token, token_sandbox, sandbox, notebooks, note_store, media_store, **extra):
+    everfetch = Everfetch(token, token_sandbox, sandbox)
+
+    note_store = store.make_store(note_store)
+    media_store = store.make_store(media_store)
+
+    existing_note_set = set(Note(data) for data in note_store)
+    remote_note_set = set(Note(data) for data in everfetch.fetch_note_metadata(notebooks))
+
+    for note in update_notes(everfetch, existing_note_set, remote_note_set):
+        note.save(note_store, media_store)
 
 
 def download_notes(**settings):
