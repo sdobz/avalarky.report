@@ -1,8 +1,7 @@
 import pickle
 from os import path, makedirs
 import os
-import toml
-
+import yaml
 
 class hashabledict(dict):
     def __key(self):
@@ -138,10 +137,11 @@ class FileStore(Store):
 
 class KyreStore(FileStore):
     def __setitem__(self, key, data):
-        super(KyreStore, self).__setitem__(key, toml.dumps(data))
+        super(KyreStore, self).__setitem__(key, yaml.dump(data))
 
     def __getitem__(self, key):
-        return toml.loads(super(KyreStore, self).__getitem__(key))
+        # TODO: yaml.load can handle a file stream, to reduce memory do not read entire file into memory
+        return yaml.load(super(KyreStore, self).__getitem__(key))
 
 
 store_classes = {
