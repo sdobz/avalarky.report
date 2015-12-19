@@ -18,6 +18,20 @@ avalarky.report:
         rebuild-notes: false
         sandbox: false
 - ~command.add:
+    name: evernote2
+    run:
+      ~everdown.download_notes2:
+        <<: *secret_everdown
+        sandbox: false
+        notebooks: [mo*]
+        note_store:
+          type: kyre
+          root: content/everdown2
+        media_store:
+          type: file
+          root: content/everdown2/media
+
+- ~command.add:
     name: pelican
     run:
       ~pelican.run:
