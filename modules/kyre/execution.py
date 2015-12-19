@@ -33,7 +33,7 @@ def discover_modules():
             if file == '__init__.py':
                 module_import_string = root.replace(os.sep, '.')
                 log.info("Discovered module {} -> {}".format(module_name, module_import_string))
-                import_paths[EXECUTION_PREFIX + module_name] = module_import_string
+                import_paths[module_name] = module_import_string
     return import_paths
 
 
@@ -57,6 +57,9 @@ def execute_key_if_func(key, value):
     except ValueError:
         # It couldn't unpack it, so didn't have exactly one .
         return False
+
+    # Strip the execution prefix
+    module_str = module_str[len(EXECUTION_PREFIX):]
 
     module = get_module(module_str)
     if not module:
