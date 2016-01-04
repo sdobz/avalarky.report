@@ -8,7 +8,7 @@ from .parser import save_note
 from .geolocate import create_get_place
 from .store import make_store
 from .everfetch import Everfetch
-from .note import Note, update_notes
+from .note import LocalNote
 from ..kyre.dependency import inject
 import urllib3.contrib.pyopenssl
 urllib3.contrib.pyopenssl.inject_into_urllib3()
@@ -24,16 +24,20 @@ MEDIA_KEY = '{}-media'
 
 @inject('store')
 def download_notes2(store, token, token_sandbox, sandbox, notebooks, note_store, media_store, **extra):
-    everfetch = Everfetch(token, token_sandbox, sandbox)
 
-    note_store = store.make_store(note_store)
+    # TODO: Refactor store to return a class
+    local_note_store = store.make_store(note_store)
     media_store = store.make_store(media_store)
+    local_notes = set()
+    remote_notes = Everfetch(token, token_sandbox, sandbox, notebooks)
 
-    existing_note_set = set(Note(data) for data in note_store)
-    remote_note_set = set(Note(data) for data in everfetch.fetch_note_metadata(notebooks))
+    for remote_note in remote_notes:
+        local_note = LocalNote(local_note_store[remote_note.key()], media_store)
+        local_notes.add(local_note)
 
-    for note in update_notes(everfetch, existing_note_set, remote_note_set):
-        note.save(note_store, media_store)
+        if remote_note.is_newer_than(local_note):
+            local_note.update_from(remote_note)
+            local_note_store[remote_note.key()] = local_note.data
 
 
 def download_notes(**settings):

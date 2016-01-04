@@ -10,6 +10,7 @@ EXECUTION_DIRECTORY = 'modules'
 
 module_cache = {}
 discovered_modules = {}
+context = {}
 
 
 def setup_execution(prefix=EXECUTION_PREFIX,
@@ -105,9 +106,15 @@ def get_function(module_str, func_str):
 
 
 def call_func_with_arguments(func, value):
+    global context
+    context = value
     if hasattr(value, 'iteritems'):
         func(**value)
     elif hasattr(value, '__iter__'):
         func(*value)
     else:
         func(value)
+
+
+def get_context():
+    return context

@@ -24,6 +24,7 @@ avalarky.report:
         <<: *secret_everdown
         sandbox: false
         notebooks: [mo*]
+        note_key: {notebook}/{note}
         note_store:
           type: kyre
           root: content/everdown2

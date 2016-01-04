@@ -3,6 +3,7 @@ from os import path, makedirs
 import os
 import yaml
 
+
 class hashabledict(dict):
     def __key(self):
         return tuple((k,self[k]) for k in sorted(self))
@@ -71,7 +72,8 @@ class Store(object):
 class MemoryStore(Store, dict):
     def __init__(self, settings):
         assert 'name' in settings
-        super(MemoryStore, self).__init__(settings)
+        # Do not init dict
+        Store.__init__(self, settings)
 
 
 class PickleStore(Store):

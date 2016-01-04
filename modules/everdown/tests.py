@@ -57,8 +57,28 @@ def test_rate_limit():
     everfetch.sleep = orig_sleep
 
 
-def test_everfetch_init_sandbox():
+def test_everfetch_init():
     ef = Everfetch(token='token', token_sandbox='token_sandbox', sandbox=False)
     assert ef.token == 'token'
     ef = Everfetch(token='token', token_sandbox='token_sandbox', sandbox=True)
     assert ef.token == 'token_sandbox'
+
+# def test_everfetch_note_store
+# Should return a note store, and the same note store
+
+# def test_everfetch_fetch_all_notebooks
+# Test network call
+
+# def test_everfetch_fetch_note_metadata_page
+# Test network call
+
+# def test_everfetch_fetch_note
+# Test network call
+
+# def test_everfetch_fetch_note_metadata
+# Mock: fetch_notebooks
+# Mock: fetch_note_metadata_from_notebook
+# Test yeilds all of them
+
+# def test_everfetch_fetch_notebooks
+#

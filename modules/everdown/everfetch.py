@@ -3,7 +3,9 @@ from evernote.edam.error.ttypes import EDAMSystemException, EDAMErrorCode
 from evernote.edam.notestore.ttypes import NoteFilter, NotesMetadataResultSpec
 import fnmatch
 import functools
+from ..kyre.execution import get_context
 from time import sleep
+from util import slugify
 import re
 import logging
 log = logging.getLogger(__name__)
@@ -46,9 +48,10 @@ def rate_limit(f):
 
 
 class Everfetch(object):
-    def __init__(self, token, token_sandbox, sandbox):
+    def __init__(self, token, token_sandbox, sandbox, notebooks):
         self.token = token if not sandbox else token_sandbox
         self.client = EvernoteClient(token=token, sandbox=sandbox)
+        self.notebooks = notebooks
 
     @memoize
     @rate_limit
@@ -59,17 +62,29 @@ class Everfetch(object):
         """
         return self.client.get_note_store()
 
-    def fetch_note_metadata(self, notebooks):
-        for notebook in self.fetch_notebooks(notebooks):
-            for note_metadata in self.fetch_note_metadata_from_notebook(notebook):
-                yield {
-                    'metadata': note_metadata
-                }
-
     @memoize
     @rate_limit
     def fetch_all_notebooks(self):
         return self.note_store().listNotebooks(self.token)
+
+    @rate_limit
+    def fetch_note_metadata_page(self, updated_filter, offset, max_notes, result_spec):
+        return self.note_store().findNotesMetadata(self.token, updated_filter, offset, max_notes, result_spec)
+
+    @memoize
+    def fetch_note(self, note_guid):
+        return self.note_store().getNote(
+            authentication_token=self.token,
+            guid=note_guid,
+            withContent=True,
+            withResourcesData=False,
+            withResourcesRecognition=False,
+            withResourcesAlternateData=False)
+
+    def fetch_note_metadata(self, notebooks):
+        for notebook in self.fetch_notebooks(notebooks):
+            for note_metadata in self.fetch_note_metadata_from_notebook(notebook):
+                yield note_metadata
 
     def fetch_notebooks(self, notebook_globs):
         notebook_regexs = [glob_to_regex(glob) for glob in notebook_globs]
@@ -85,7 +100,7 @@ class Everfetch(object):
         offset = 0
         max_notes = 10
         while True:
-            note_results = self.fetch_note_metadata_batch(updated_filter, offset, max_notes, result_spec)
+            note_results = self.fetch_note_metadata_page(updated_filter, offset, max_notes, result_spec)
             for note_metadata in note_results.notes:
                 yield note_metadata
 
@@ -93,7 +108,32 @@ class Everfetch(object):
             if offset > note_results.totalNotes:
                 break
 
-    @rate_limit
-    def fetch_note_metadata_batch(self, updated_filter, offset, max_notes, result_spec):
-        return self.note_store().findNotesMetadata(self.token, updated_filter, offset, max_notes, result_spec)
+    def __iter__(self):
+        for note_metadata in self.fetch_note_metadata(self.notebooks):
+            yield RemoteNote(metadata=note_metadata)
+
+
+class RemoteNote(object):
+    def __init__(self, metadata, everfetch):
+        self.metadata = metadata
+        self.everfetch = everfetch
+
+    @memoize
+    def note(self):
+        return self.everfetch.fetch_note(self.metadata.guid)
+
+    @property
+    def last_modified(self):
+        return self.metadata.last_modified
+
+    def key(self):
+        context = get_context()
+        assert 'note_key' in context
+        note_key = context['note_key']
+        notebook_slug = slugify(self.metadata.notebook.name)
+        note_slug = slugify(unicode(self.note().title))
+        return note_key.format(notebook=notebook_slug, note=note_slug)
+
+    def is_newer_than(self, local_note):
+        if self.last_modified > local_note.last_modified:
 
